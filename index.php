@@ -523,15 +523,15 @@ require_once __DIR__ . '/auth_config.php';
     </main>
     <nav class="bottom-nav" aria-label="Navigation principale">
       <button class="bottom-item active" type="button" data-nav="home" aria-label="Accueil"><span class="ico">⌂</span></button>
-      <button class="bottom-item" type="button" data-nav="search" aria-label="Recherche"><span class="ico">⌕</span></button>
-      <button class="bottom-item" type="button" data-nav="favorites" aria-label="Favoris"><span class="ico">♡</span></button>
+      <a class="bottom-item" href="search.php" aria-label="Recherche"><span class="ico">⌕</span></a>
+      <a class="bottom-item" href="favorites.php" aria-label="Favoris"><span class="ico">♡</span></a>
       <a class="bottom-item" href="profile.php" aria-label="Profil"><span class="ico">◉</span></a>
     </nav>
   </div>
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
   <aside class="drawer" id="drawer" aria-hidden="true">
     <div class="drawer-head"><div class="drawer-profile"><span class="avatar-btn" style="box-shadow:none"><span class="avatar-inner" id="drawerAvatarInitial">S</span></span><div><strong id="drawerName">Studimove</strong><span id="drawerUsername">@studimove</span></div></div><button class="close-btn" id="closeMenuBtn" type="button">×</button></div>
-    <div class="drawer-menu"><button class="drawer-link active" type="button" data-menu="home"><span class="menu-ico">⌂</span>Accueil</button><button class="drawer-link" type="button" data-menu="community"><span class="menu-ico">👥</span>Communauté</button><a class="drawer-link" href="profile.php"><span class="menu-ico">◉</span>Mon profil</a><button class="drawer-link" type="button" data-menu="favorites"><span class="menu-ico">♥</span>Mes favoris</button><button class="drawer-link" type="button" data-menu="reservations"><span class="menu-ico">▣</span>Mes réservations</button><button class="drawer-link" type="button" data-menu="settings"><span class="menu-ico">⚙</span>Paramètres</button><button class="drawer-link" type="button" data-menu="support"><span class="menu-ico">?</span>Aide & support</button></div>
+    <div class="drawer-menu"><a class="drawer-link active" href="index.php"><span class="menu-ico">⌂</span>Accueil</a><a class="drawer-link" href="community.php"><span class="menu-ico">👥</span>Communauté</a><a class="drawer-link" href="profile.php"><span class="menu-ico">◉</span>Mon profil</a><a class="drawer-link" href="favorites.php"><span class="menu-ico">♥</span>Mes favoris</a><a class="drawer-link" href="reservations.php"><span class="menu-ico">▣</span>Mes réservations</a><a class="drawer-link" href="settings.php"><span class="menu-ico">⚙</span>Paramètres</a><a class="drawer-link" href="support.php"><span class="menu-ico">?</span>Aide & support</a></div>
     <div class="drawer-footer"><button class="drawer-link logout-link" id="logoutBtn" type="button"><span class="menu-ico">↩</span>Se déconnecter</button></div>
   </aside>
   <section class="detail-overlay" id="detailOverlay" aria-hidden="true"></section>
