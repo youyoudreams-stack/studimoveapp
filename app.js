@@ -845,11 +845,9 @@ function bindScrollUX() {
 async function init(){
   bindEvents(); renderCategories(); renderSpotlight(); renderFeed(); bindScrollUX(); track('app_home_view');
 
-  // Chargement parallèle : user + cards
   try {
     const [user] = await Promise.all([
       fetchCurrentUser(),
-      fetchCards(),
     ]);
     if(!user) return;
     state.user = user;
