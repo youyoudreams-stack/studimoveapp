@@ -525,7 +525,7 @@ require_once __DIR__ . '/auth_config.php';
       <button class="bottom-item active" type="button" data-nav="home" aria-label="Accueil"><span class="ico">⌂</span></button>
       <button class="bottom-item" type="button" data-nav="search" aria-label="Recherche"><span class="ico">⌕</span></button>
       <button class="bottom-item" type="button" data-nav="favorites" aria-label="Favoris"><span class="ico">♡</span></button>
-      <button class="bottom-item" type="button" data-nav="profile" aria-label="Profil"><span class="ico">◉</span></button>
+      <a class="bottom-item" href="profile.php" aria-label="Profil"><span class="ico">◉</span></a>
     </nav>
   </div>
   <div class="drawer-backdrop" id="drawerBackdrop"></div>
