@@ -67,8 +67,8 @@ require_once __DIR__ . '/auth_config.php';
     .post-img{width:100%;height:100%;background-size:cover;background-position:center;display:block}
     .media-badge{position:absolute;right:13px;top:13px;background:rgba(0,0,0,.42);color:#fff;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:950;backdrop-filter:blur(10px)}
     .event-pill{position:absolute;left:13px;top:13px;background:#fff;color:#111827;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:950;display:flex;align-items:center;gap:6px;box-shadow:0 10px 22px rgba(0,0,0,.12)}
-    .favorite-btn{position:absolute;right:13px;bottom:13px;width:42px;height:42px;border:0;border-radius:999px;background:rgba(255,255,255,.94);color:#111827;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:0 10px 22px rgba(0,0,0,.16);backdrop-filter:blur(10px)}
-    .favorite-btn.active{color:#ef4444}
+    .favorite-btn{position:absolute;right:13px;bottom:13px;width:44px;height:44px;border:0;border-radius:999px;background:rgba(0,0,0,.28);backdrop-filter:blur(10px);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:none;transition:background .18s ease,box-shadow .18s ease}
+    .favorite-btn.active{background:rgba(255,255,255,.97);color:#ed4956;box-shadow:0 4px 16px rgba(237,73,86,.3)}
     .post-body{padding:14px}
     .post-title{margin:0 0 7px;font-size:16px;line-height:1.2;font-weight:950;letter-spacing:-.2px}
     .post-text{margin:0;color:#475467;font-size:13px;line-height:1.45;font-weight:600}
@@ -431,12 +431,13 @@ require_once __DIR__ . '/auth_config.php';
   
 
     /* V44 - Ouverture événement/post + favoris premium */
-    .favorite-btn,.favorite-detail{overflow:visible;transition:transform .18s ease,background .18s ease,box-shadow .18s ease;color:#111827}
-    .favorite-btn .heart-svg,.favorite-detail .heart-svg{width:21px;height:21px;display:block;fill:rgba(17,24,39,.08);stroke:currentColor;stroke-width:2.2;transition:fill .18s ease,stroke .18s ease,transform .18s ease;filter:drop-shadow(0 6px 10px rgba(0,0,0,.12))}
-    .favorite-btn.active,.favorite-detail.active{color:#ef233c;background:rgba(255,255,255,.98);box-shadow:0 14px 30px rgba(239,35,60,.22)}
-    .favorite-btn.active .heart-svg,.favorite-detail.active .heart-svg{fill:#ef233c;stroke:#ef233c;transform:scale(1.04)}
-    .favorite-btn.heart-pop .heart-svg,.favorite-detail.heart-pop .heart-svg{animation:heartPop .42s cubic-bezier(.2,1.8,.35,1)}
-    @keyframes heartPop{0%{transform:scale(.75)}45%{transform:scale(1.35)}70%{transform:scale(.92)}100%{transform:scale(1.04)}}
+    .favorite-btn,.favorite-detail{overflow:visible}
+    .favorite-btn .heart-svg,.favorite-detail .heart-svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:fill .15s ease,stroke .15s ease,transform .15s ease;filter:drop-shadow(0 1px 3px rgba(0,0,0,.25))}
+    .favorite-detail{width:44px;height:44px;border:0;border-radius:999px;background:rgba(0,0,0,.22);backdrop-filter:blur(10px);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .18s ease,box-shadow .18s ease}
+    .favorite-btn.active,.favorite-detail.active{color:#ed4956}
+    .favorite-btn.active .heart-svg,.favorite-detail.active .heart-svg{fill:#ed4956;stroke:#ed4956;transform:scale(1.1)}
+    .favorite-btn.heart-pop .heart-svg,.favorite-detail.heart-pop .heart-svg{animation:heartPop .45s cubic-bezier(.17,.89,.32,1.49)}
+    @keyframes heartPop{0%{transform:scale(.6)}40%{transform:scale(1.28)}70%{transform:scale(.93)}100%{transform:scale(1.1)}}
     .premium-detail{background:linear-gradient(180deg,#fff 0%,#f7faff 100%);padding-bottom:32px}
     .detail-top.premium{border-bottom:0;background:rgba(255,255,255,.88);box-shadow:0 8px 24px rgba(16,24,40,.06)}
     .detail-premium-header{padding:18px 18px 10px;text-align:center;max-width:860px;margin:0 auto}
@@ -511,12 +512,13 @@ require_once __DIR__ . '/auth_config.php';
 
 
     /* V44 - Ouverture événement/post + favoris premium */
-    .favorite-btn,.favorite-detail{overflow:visible;transition:transform .18s ease,background .18s ease,box-shadow .18s ease;color:#111827}
-    .favorite-btn .heart-svg,.favorite-detail .heart-svg{width:21px;height:21px;display:block;fill:rgba(17,24,39,.08);stroke:currentColor;stroke-width:2.2;transition:fill .18s ease,stroke .18s ease,transform .18s ease;filter:drop-shadow(0 6px 10px rgba(0,0,0,.12))}
-    .favorite-btn.active,.favorite-detail.active{color:#ef233c;background:rgba(255,255,255,.98);box-shadow:0 14px 30px rgba(239,35,60,.22)}
-    .favorite-btn.active .heart-svg,.favorite-detail.active .heart-svg{fill:#ef233c;stroke:#ef233c;transform:scale(1.04)}
-    .favorite-btn.heart-pop .heart-svg,.favorite-detail.heart-pop .heart-svg{animation:heartPop .42s cubic-bezier(.2,1.8,.35,1)}
-    @keyframes heartPop{0%{transform:scale(.75)}45%{transform:scale(1.35)}70%{transform:scale(.92)}100%{transform:scale(1.04)}}
+    .favorite-btn,.favorite-detail{overflow:visible}
+    .favorite-btn .heart-svg,.favorite-detail .heart-svg{width:22px;height:22px;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:fill .15s ease,stroke .15s ease,transform .15s ease;filter:drop-shadow(0 1px 3px rgba(0,0,0,.25))}
+    .favorite-detail{width:44px;height:44px;border:0;border-radius:999px;background:rgba(0,0,0,.22);backdrop-filter:blur(10px);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .18s ease,box-shadow .18s ease}
+    .favorite-btn.active,.favorite-detail.active{color:#ed4956}
+    .favorite-btn.active .heart-svg,.favorite-detail.active .heart-svg{fill:#ed4956;stroke:#ed4956;transform:scale(1.1)}
+    .favorite-btn.heart-pop .heart-svg,.favorite-detail.heart-pop .heart-svg{animation:heartPop .45s cubic-bezier(.17,.89,.32,1.49)}
+    @keyframes heartPop{0%{transform:scale(.6)}40%{transform:scale(1.28)}70%{transform:scale(.93)}100%{transform:scale(1.1)}}
     .premium-detail{background:linear-gradient(180deg,#fff 0%,#f7faff 100%);padding-bottom:32px}
     .detail-top.premium{border-bottom:0;background:rgba(255,255,255,.88);box-shadow:0 8px 24px rgba(16,24,40,.06)}
     .detail-premium-header{padding:18px 18px 10px;text-align:center;max-width:860px;margin:0 auto}

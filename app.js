@@ -452,7 +452,7 @@ function formatEventDate(start, end){
   }catch(e){return ''}
 }
 function favoriteIcon(isActive=false){
-  return `<span class="heart-svg-wrap" aria-hidden="true"><svg class="heart-svg" viewBox="0 0 24 24"><path d="M12 21s-7.2-4.35-9.4-9.1C.9 8.22 2.76 4.5 6.38 4.5c2.06 0 3.47 1.08 4.32 2.22C11.55 5.58 12.96 4.5 15.02 4.5c3.62 0 5.48 3.72 3.78 7.4C19.2 16.65 12 21 12 21Z"></path></svg></span>`;
+  return `<span class="heart-svg-wrap" aria-hidden="true"><svg class="heart-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>`;
 }
 function safeUrl(v){ const s=String(v||'').trim(); return /^https?:\/\//i.test(s)?s:'#'; }
 async function fetchCurrentUser(){const res=await fetch('api/auth.php?action=me',{credentials:'same-origin'});const data=await res.json();if(!data.ok||!data.authenticated){const qs=new URLSearchParams(window.location.search);const rt=qs.get('reservation_token')||qs.get('token')||'';window.location.href='login.php'+(rt?('?reservation_token='+encodeURIComponent(rt)):'');return null}return data.user}
