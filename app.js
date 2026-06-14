@@ -460,21 +460,59 @@ function hydrateUser(user){const firstName=displayName(user);const initials=init
 function renderCategories(){$('#categorySlider').innerHTML=categories.map(cat=>`<button class="category-card" type="button" data-category="${escapeHtml(cat.title)}" style="background-image:url('${cat.image}')"><span class="category-title">${escapeHtml(cat.title)}</span></button>`).join('')}
 function renderSpotlightDesktop(){
   const el=$('#spotlightDesktopGrid');
-  if(!el) return;
-  el.innerHTML=spotlightItems.map((item,i)=>`
-    <article class="sdg-card ${i===0?'sdg-hero':''}" data-open-id="${escapeHtml(item.id)}">
+  if(!el||!spotlightItems.length) return;
+
+  const hero=spotlightItems[0];
+  const rest=spotlightItems.slice(1);
+  const perPage=2;
+
+  // Découpe les cartes restantes en pages de 2
+  const pages=[];
+  for(let i=0;i<rest.length;i+=perPage) pages.push(rest.slice(i,i+perPage));
+
+  function cardHtml(item){
+    return `<article class="sdg-card" data-open-id="${escapeHtml(item.id)}">
       <div class="sdg-img" style="background-image:url('${item.image}')"></div>
       <div class="sdg-overlay">
         <span class="sdg-rank">${item.rank}</span>
         <span class="sdg-tag">${escapeHtml(item.tag||'À la une')}</span>
         <h3 class="sdg-title">${escapeHtml(item.title)}</h3>
-        <div class="sdg-meta">
-          <span>${escapeHtml(item.date||'')}</span>
-          ${item.price?`<span class="sdg-price">${escapeHtml(item.price)}</span>`:''}
-        </div>
+        <div class="sdg-meta"><span>${escapeHtml(item.date||'')}</span>${item.price?`<span class="sdg-price">${escapeHtml(item.price)}</span>`:''}</div>
       </div>
-    </article>
-  `).join('');
+    </article>`;
+  }
+
+  const heroHtml=`<article class="sdg-hero" data-open-id="${escapeHtml(hero.id)}">
+    <div class="sdg-img" style="background-image:url('${hero.image}')"></div>
+    <div class="sdg-overlay">
+      <span class="sdg-rank">${hero.rank}</span>
+      <span class="sdg-tag">${escapeHtml(hero.tag||'À la une')}</span>
+      <h3 class="sdg-title">${escapeHtml(hero.title)}</h3>
+      <div class="sdg-meta"><span>${escapeHtml(hero.date||'')}</span>${hero.price?`<span class="sdg-price">${escapeHtml(hero.price)}</span>`:''}</div>
+    </div>
+  </article>`;
+
+  const pagesHtml=pages.map((page,pi)=>`
+    <div class="sdg-page${pi===0?' active':''}" data-page="${pi}">
+      ${page.map(cardHtml).join('')}
+      ${page.length<perPage?'<div class="sdg-empty"></div>':''}
+    </div>`).join('');
+
+  const dotsHtml=pages.length>1
+    ?`<div class="sdg-dots">${pages.map((_,i)=>`<button class="sdg-dot${i===0?' active':''}" data-goto="${i}" aria-label="Page ${i+1}"></button>`).join('')}</div>`
+    :'';
+
+  el.innerHTML=`${heroHtml}<div class="sdg-right"><div class="sdg-pages">${pagesHtml}</div>${dotsHtml}</div>`;
+
+  // Navigation par les dots
+  el.querySelectorAll('.sdg-dot').forEach(dot=>{
+    dot.addEventListener('click',e=>{
+      e.stopPropagation();
+      const p=parseInt(dot.dataset.goto);
+      el.querySelectorAll('.sdg-page').forEach((pg,i)=>pg.classList.toggle('active',i===p));
+      el.querySelectorAll('.sdg-dot').forEach((d,i)=>d.classList.toggle('active',i===p));
+    });
+  });
 }
 function renderSpotlight(){
   const el=$('#spotlightRow');
