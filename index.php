@@ -458,6 +458,31 @@ require_once __DIR__ . '/auth_config.php';
     .detail-video-box iframe{width:100%;height:260px;border:0;border-radius:22px;background:#000;box-shadow:0 14px 34px rgba(16,24,40,.14)}.detail-whatsapp{display:flex;justify-content:center;align-items:center;margin-top:14px;padding:13px 16px;border-radius:999px;background:#e9fbf0;color:#067647;text-decoration:none;font-weight:950;border:1px solid #bbf7d0}
     @media(min-width:900px){.detail-meta-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.detail-gallery-grid.premium{grid-template-columns:repeat(4,minmax(0,1fr))}.detail-gallery-img.premium{height:150px}.detail-video-box iframe{height:360px}}
 
+    /* ── Desktop À la une grid ── */
+    .spotlight-desktop-grid{display:none}
+    @media(min-width:780px){
+      .spotlight-row{display:none!important}
+      .spotlight-desktop-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:10px;height:520px;border-radius:26px;overflow:hidden;margin-bottom:8px}
+      .sdg-card{position:relative;overflow:hidden;cursor:pointer;background:#111}
+      .sdg-hero{grid-column:1;grid-row:1/3}
+      .sdg-img{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .55s ease}
+      .sdg-card:hover .sdg-img{transform:scale(1.05)}
+      .sdg-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.02) 0%,rgba(0,0,0,.1) 35%,rgba(0,0,0,.75) 100%);display:flex;flex-direction:column;justify-content:flex-end;padding:20px}
+      .sdg-rank{position:absolute;top:14px;left:16px;background:rgba(255,255,255,.95);color:#111;border-radius:999px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-weight:950;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.22)}
+      .sdg-hero .sdg-rank{width:46px;height:46px;font-size:20px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;box-shadow:0 8px 20px rgba(11,108,255,.35)}
+      .sdg-tag{display:inline-block;background:rgba(255,255,255,.15);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:999px;padding:5px 11px;font-size:11px;font-weight:900;margin-bottom:9px;width:fit-content}
+      .sdg-title{color:#fff;margin:0 0 8px;font-weight:950;line-height:1.1;text-shadow:0 2px 14px rgba(0,0,0,.45)}
+      .sdg-hero .sdg-title{font-size:28px;letter-spacing:-.5px}
+      .sdg-card:not(.sdg-hero) .sdg-title{font-size:15px}
+      .sdg-meta{color:rgba(255,255,255,.82);font-size:12px;font-weight:750;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+      .sdg-price{background:linear-gradient(90deg,var(--blue),var(--cyan));color:#fff;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:950}
+    }
+    @media(min-width:1180px){
+      .spotlight-desktop-grid{height:600px}
+      .sdg-hero .sdg-title{font-size:34px}
+      .sdg-overlay{padding:26px}
+    }
+
   </style>
 </head>
 <body>
@@ -475,6 +500,7 @@ require_once __DIR__ . '/auth_config.php';
           <p class="spotlight-text">Découvre les expériences les plus plébiscitées par les étudiants.</p>
         </div>
         <div class="spotlight-row" id="spotlightRow"></div>
+        <div class="spotlight-desktop-grid" id="spotlightDesktopGrid"></div>
       </section>
 
       <section><div class="section-title-row"><h2 class="section-title">Explorer</h2><button class="section-link" type="button" data-toast="Toutes les catégories arrivent bientôt">Voir tout</button></div><div class="h-scroll" id="categorySlider"></div></section>

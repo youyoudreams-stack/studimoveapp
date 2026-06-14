@@ -458,6 +458,24 @@ function safeUrl(v){ const s=String(v||'').trim(); return /^https?:\/\//i.test(s
 async function fetchCurrentUser(){const res=await fetch('api/auth.php?action=me',{credentials:'same-origin'});const data=await res.json();if(!data.ok||!data.authenticated){const qs=new URLSearchParams(window.location.search);const rt=qs.get('reservation_token')||qs.get('token')||'';window.location.href='login.php'+(rt?('?reservation_token='+encodeURIComponent(rt)):'');return null}return data.user}
 function hydrateUser(user){const firstName=displayName(user);const initials=initialsFromUser(user);const username=user?.username?`@${user.username}`:'@studimove';$('#helloTitle').textContent=`Hello ${firstName} !`;$('#drawerAvatarInitial').textContent=initials;$('#drawerName').textContent=`${user?.first_name||''} ${user?.last_name||''}`.trim()||firstName;$('#drawerUsername').textContent=username}
 function renderCategories(){$('#categorySlider').innerHTML=categories.map(cat=>`<button class="category-card" type="button" data-category="${escapeHtml(cat.title)}" style="background-image:url('${cat.image}')"><span class="category-title">${escapeHtml(cat.title)}</span></button>`).join('')}
+function renderSpotlightDesktop(){
+  const el=$('#spotlightDesktopGrid');
+  if(!el) return;
+  el.innerHTML=spotlightItems.map((item,i)=>`
+    <article class="sdg-card ${i===0?'sdg-hero':''}" data-open-id="${escapeHtml(item.id)}">
+      <div class="sdg-img" style="background-image:url('${item.image}')"></div>
+      <div class="sdg-overlay">
+        <span class="sdg-rank">${item.rank}</span>
+        <span class="sdg-tag">${escapeHtml(item.tag||'À la une')}</span>
+        <h3 class="sdg-title">${escapeHtml(item.title)}</h3>
+        <div class="sdg-meta">
+          <span>${escapeHtml(item.date||'')}</span>
+          ${item.price?`<span class="sdg-price">${escapeHtml(item.price)}</span>`:''}
+        </div>
+      </div>
+    </article>
+  `).join('');
+}
 function renderSpotlight(){
   const el=$('#spotlightRow');
   if(!el) return;
@@ -479,6 +497,7 @@ function renderSpotlight(){
       <button class="spotlight-cta" type="button" data-open-id="${escapeHtml(item.id)}">Voir</button>
     </article>
   `).join('');
+  renderSpotlightDesktop();
 }
 
 function renderEventSocialProof(item){if(item.type!=='event')return ''; const avatars=profileImgs.map(url=>`<span class="mini-avatar" style="background-image:url('${url}')"></span>`).join(''); return `<div class="event-social-proof"><div class="avatar-stack">${avatars}</div><div class="event-counts"><span>${item.interested||0} intéressés</span><span>${item.going||0} inscrits</span></div></div>`}
