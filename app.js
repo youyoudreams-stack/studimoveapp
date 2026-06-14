@@ -1,4 +1,4 @@
-
+﻿
 (function injectReservationsStyle(){
   if(document.getElementById('reservations-style')) return;
   const s=document.createElement('style');
@@ -57,9 +57,9 @@ const people = [
   {name:'Sofia Moreau', school:'Kedge · Marseille', avatar:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80'},
 ];
 const comments = [
-  {name:'Lina Martin', text:'Trop chaud, ça a l’air incroyable !', time:'il y a 8 min', avatar:people[0].avatar},
-  {name:'Yanis Benali', text:'On peut venir avec des potes d’une autre école ?', time:'il y a 22 min', avatar:people[1].avatar},
-  {name:'Emma Leroy', text:'Je veux plus d’infos sur le transport.', time:'il y a 1 h', avatar:people[2].avatar},
+  {name:'Lina Martin', text:"Trop chaud, ça a l'air incroyable !", time:'il y a 8 min', avatar:people[0].avatar},
+  {name:'Yanis Benali', text:"On peut venir avec des potes d'une autre école ?", time:'il y a 22 min', avatar:people[1].avatar},
+  {name:'Emma Leroy', text:"Je veux plus d'infos sur le transport.", time:'il y a 1 h', avatar:people[2].avatar},
 ];
 
 const profileImgs = people.slice(0,4).map(p=>p.avatar);
@@ -85,27 +85,27 @@ let feeds = {
 // ─── Cards CRM → feed items ───────────────────────────────────────────────────
 
 function cardToFeedItem(card) {
-  const marqueRaw = (card.marque || ‘studimove’).toLowerCase();
+  const marqueRaw = (card.marque || 'studimove').toLowerCase();
   const entity = marqueRaw.charAt(0).toUpperCase() + marqueRaw.slice(1);
   const initials = marqueRaw.slice(0, 2).toUpperCase();
   const metaParts = [card.tag, card.ville || card.cities, card.date_text].filter(Boolean);
   return {
     id:            card.id,
     _card:         true,
-    type:          ‘event’,
+    type:          'event',
     entity:        entity,
     initials:      initials,
-    meta:          metaParts.join(‘ · ‘),
+    meta:          metaParts.join(' · '),
     title:         card.title,
-    text:          card.slogan || (card.desc_text || ‘’).slice(0, 200),
+    text:          card.slogan || (card.desc_text || '').slice(0, 200),
     image:         card.image,
     likes:         0,
     comments:      0,
-    badge:         card.tag || ‘Événement’,
+    badge:         card.tag || 'Événement',
     interested:    0,
     going:         0,
     date:          card.date_text,
-    place:         card.ville || card.cities || ‘’,
+    place:         card.ville || card.cities || '',
     price:         card.price,
     // détail enrichi
     slogan:        card.slogan,
@@ -142,7 +142,7 @@ function buildSpotlightFromCards(cards) {
 
 async function fetchCards() {
   try {
-    const res  = await fetch(‘api/cards.php’, { credentials: ‘same-origin’ });
+    const res  = await fetch('api/cards.php', { credentials: 'same-origin' });
     const data = await res.json();
     if (!data.ok || !Array.isArray(data.cards)) return;
 
@@ -159,12 +159,12 @@ async function fetchCards() {
     // Feed "Pour toi" = toutes les cards
     const feedItems = data.cards.map(cardToFeedItem);
     feeds.forYou  = feedItems;
-    feeds.follow  = feedItems;  // même contenu pour l’instant
+    feeds.follow  = feedItems;  // même contenu pour l'instant
     feeds.campus  = feedItems;
     renderFeed();
 
   } catch (e) {
-    console.warn(‘fetchCards error:’, e);
+    console.warn('fetchCards error:', e);
     // Pas de crash : le feed reste vide ou affiche un message
   }
 }
@@ -273,10 +273,10 @@ function renderVideo(item){
   return `<div class="detail-video-box"><div class="detail-gallery-title">Vidéo</div><iframe src="${safeUrl(item.video_url)}" title="Vidéo ${escapeHtml(item.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
 }
 function renderEventBox(item){
-  const hasBilletterie = item.ticketing_url && item.ticketing_url !== ‘#’;
-  const hasWhatsApp    = item.whatsapp_url  && item.whatsapp_url  !== ‘#’;
+  const hasBilletterie = item.ticketing_url && item.ticketing_url !== '#';
+  const hasWhatsApp    = item.whatsapp_url  && item.whatsapp_url  !== '#';
 
-  let ctaHtml = ‘’;
+  let ctaHtml = '';
   if (hasBilletterie && hasWhatsApp) {
     ctaHtml = `
       <a class="event-cta join" href="${safeUrl(item.ticketing_url)}" target="_blank" rel="noopener" data-track-cta="billetterie" data-event-id="${escapeHtml(item.id)}">Réserver ma place</a>
@@ -295,7 +295,7 @@ function renderEventBox(item){
       <button class="event-cta join" data-event-action="join" data-event-id="${escapeHtml(item.id)}">Je participe</button>`;
   }
 
-  return `<div class="detail-event-box premium"><h3>Statut de l’événement</h3><div class="event-detail-stats"><div class="event-detail-stat"><strong>${item.interested||0}</strong><span>intéressés</span></div><div class="event-detail-stat"><strong>${item.going||0}</strong><span>inscrits</span></div></div>${renderEventSocialProof(item)}</div><div class="event-cta-row premium">${ctaHtml}</div>`;
+  return `<div class="detail-event-box premium"><h3>Statut de l'événement</h3><div class="event-detail-stats"><div class="event-detail-stat"><strong>${item.interested||0}</strong><span>intéressés</span></div><div class="event-detail-stat"><strong>${item.going||0}</strong><span>inscrits</span></div></div>${renderEventSocialProof(item)}</div><div class="event-cta-row premium">${ctaHtml}</div>`;
 }
 function renderDetailPanels(item){
   const isEvent=item.type==='event';
@@ -448,7 +448,7 @@ function renderReservationsContent(rows,targetReservationId=''){
         <div class="reservation-toolbar"><div><strong>Attribution des billets</strong><span>Rôle : ${escapeHtml(roles||'BUYER')} · Statut : ${escapeHtml(r.validation_status||r.status||'—')}</span></div><button class="reservation-mail-btn" type="button" data-send-reservation-email="${escapeHtml(r.id)}">Envoyer le lien</button></div>
         ${renderReservationGroup('Participants','Billets participant au séjour',participants)}
         ${renderReservationGroup('Options','Options et extras du séjour',options)}
-        <div class="reservation-help"><div><strong>Conseil</strong><p>Attribue chaque billet avant le départ pour gagner du temps le jour J.</p></div><button type="button" data-menu="support">Besoin d’aide ?</button></div>
+        <div class="reservation-help"><div><strong>Conseil</strong><p>Attribue chaque billet avant le départ pour gagner du temps le jour J.</p></div><button type="button" data-menu="support">Besoin d'aide ?</button></div>
       </div>`:''}
     </article>`;
   }).join('')}</div>`;
@@ -464,7 +464,7 @@ function renderReservationLine(it){
   const confirmed=!!it.is_confirmed_by_buyer;
   const assignLabel=isAssignedToMe?'Attribué à moi':confirmed?'Attribué':'À attribuer';
   const initials=([it.first_name,it.last_name].filter(Boolean).join(' ')||labelItemType(it.item_type)||'B').split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
-  return `<div class="reservation-line ${isCancelled?'cancelled':''}" data-item-id="${escapeHtml(it.id)}"><div class="reservation-line-avatar">${escapeHtml(initials)}</div><div class="reservation-line-main"><strong>${escapeHtml([it.first_name,it.last_name].filter(Boolean).join(' ')||'Participant à attribuer')}</strong><span>${escapeHtml(it.title||labelItemType(it.item_type))}</span></div><div class="reservation-line-status"><span>${escapeHtml(statusLabel(it.item_status))}</span><em>${escapeHtml(isCancelled?'Non attribuable':assignLabel)}</em></div><div class="reservation-line-actions"><button class="reservation-action" type="button" data-confirm-me="${escapeHtml(it.id)}" ${isCancelled?'disabled':''}>C’est moi</button><button class="reservation-action secondary" type="button" data-confirm-other="${escapeHtml(it.id)}" ${isCancelled?'disabled':''}>Quelqu’un d’autre</button></div></div>`;
+  return `<div class="reservation-line ${isCancelled?'cancelled':''}" data-item-id="${escapeHtml(it.id)}"><div class="reservation-line-avatar">${escapeHtml(initials)}</div><div class="reservation-line-main"><strong>${escapeHtml([it.first_name,it.last_name].filter(Boolean).join(' ')||'Participant à attribuer')}</strong><span>${escapeHtml(it.title||labelItemType(it.item_type))}</span></div><div class="reservation-line-status"><span>${escapeHtml(statusLabel(it.item_status))}</span><em>${escapeHtml(isCancelled?'Non attribuable':assignLabel)}</em></div><div class="reservation-line-actions"><button class="reservation-action" type="button" data-confirm-me="${escapeHtml(it.id)}" ${isCancelled?'disabled':''}>C'est moi</button><button class="reservation-action secondary" type="button" data-confirm-other="${escapeHtml(it.id)}" ${isCancelled?'disabled':''}>Quelqu'un d'autre</button></div></div>`;
 }
 function openReservations(targetReservationId=''){
   const overlay=$('#detailOverlay');
