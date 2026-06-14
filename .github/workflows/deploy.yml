@@ -17,5 +17,5 @@ jobs:
           port: ${{ secrets.SFTP_PORT }}
           password: ${{ secrets.SFTP_PASSWORD }}
           local_path: './*'
-          remote_path: '/'
+          remote_path: '/clickandbuilds/StudiMOVE879797/studimove_app_test'
           sftp_only: true
