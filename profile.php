@@ -2,7 +2,6 @@
 declare(strict_types=1);
 require_once __DIR__ . '/auth_config.php';
 
-session_start();
 $session_token = $_COOKIE[SESSION_COOKIE_NAME] ?? '';
 ?>
 <!doctype html>
