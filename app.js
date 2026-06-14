@@ -17,7 +17,7 @@
   document.head.appendChild(s);
 })();
 
-const state = { user: null, activeFeed: 'forYou', favoriteIds: new Set(), eventActions: {}, reservations: [], reservationsLoaded: false, openReservationId: '', cards: [], cardsLoaded: false };
+const state = { user: null, activeFeed: 'forYou', activeCategory: null, favoriteIds: new Set(), eventActions: {}, reservations: [], reservationsLoaded: false, openReservationId: '', cards: [], cardsLoaded: false };
 
 window.dataLayer = window.dataLayer || [];
 function track(eventName, params = {}) {
@@ -457,7 +457,16 @@ function favoriteIcon(isActive=false){
 function safeUrl(v){ const s=String(v||'').trim(); return /^https?:\/\//i.test(s)?s:'#'; }
 async function fetchCurrentUser(){const res=await fetch('api/auth.php?action=me',{credentials:'same-origin'});const data=await res.json();if(!data.ok||!data.authenticated){const qs=new URLSearchParams(window.location.search);const rt=qs.get('reservation_token')||qs.get('token')||'';window.location.href='login.php'+(rt?('?reservation_token='+encodeURIComponent(rt)):'');return null}return data.user}
 function hydrateUser(user){const firstName=displayName(user);const initials=initialsFromUser(user);const username=user?.username?`@${user.username}`:'@studimove';$('#helloTitle').textContent=`Hello ${firstName} !`;$('#drawerAvatarInitial').textContent=initials;$('#drawerName').textContent=`${user?.first_name||''} ${user?.last_name||''}`.trim()||firstName;$('#drawerUsername').textContent=username}
-function renderCategories(){$('#categorySlider').innerHTML=categories.map(cat=>`<button class="category-card" type="button" data-category="${escapeHtml(cat.title)}" style="background-image:url('${cat.image}')"><span class="category-title">${escapeHtml(cat.title)}</span></button>`).join('')}
+const CATEGORY_MAP = { 'Voyages':'Voyage', 'Soirées':'Soirée', 'Sorties':'Sortie', 'Bon plan':'Bon plan', 'Jeux concours':'Jeux concours' };
+function renderCategories(){
+  $('#categorySlider').innerHTML=categories.map(cat=>`<button class="category-card${state.activeCategory===cat.title?' category-active':''}" type="button" data-category="${escapeHtml(cat.title)}" style="background-image:url('${cat.image}')"><span class="category-title">${escapeHtml(cat.title)}</span></button>`).join('');
+}
+function setActiveCategory(title){
+  state.activeCategory = state.activeCategory===title ? null : title;
+  renderCategories();
+  renderFeed();
+  track('category_filter',{category:title,active:!!state.activeCategory});
+}
 function renderSpotlightDesktop(){
   const el=$('#spotlightDesktopGrid');
   if(!el||!spotlightItems.length) return;
@@ -540,11 +549,16 @@ function renderSpotlight(){
 
 function renderEventSocialProof(item){if(item.type!=='event')return ''; const avatars=profileImgs.map(url=>`<span class="mini-avatar" style="background-image:url('${url}')"></span>`).join(''); return `<div class="event-social-proof"><div class="avatar-stack">${avatars}</div><div class="event-counts"><span>${item.interested||0} intéressés</span><span>${item.going||0} inscrits</span></div></div>`}
 function renderFeed(){
-  const items=feeds[state.activeFeed]||[], feedList=$('#feedList');
+  let items=feeds[state.activeFeed]||[];
+  if(state.activeCategory){
+    const target=CATEGORY_MAP[state.activeCategory]||state.activeCategory;
+    items=items.filter(e=>e.category===target||e.badge===target);
+  }
+  const feedList=$('#feedList');
   if(!items.length){
-    feedList.innerHTML=state.cardsLoaded
-      ? `<div class="loading-card">Aucun contenu pour le moment.</div>`
-      : `<div class="loading-card">Chargement des événements...</div>`;
+    feedList.innerHTML=state.activeCategory
+      ? `<div class="loading-card">Aucun événement dans la catégorie <strong>${escapeHtml(state.activeCategory)}</strong>.</div>`
+      : `<div class="loading-card">Aucun contenu pour le moment.</div>`;
     return;
   }
   feedList.innerHTML=items.map(item=>{
@@ -822,7 +836,7 @@ function bindEvents(){
     const eventAction=e.target.closest('[data-event-action]'); if(eventAction){handleEventAction(eventAction.dataset.eventAction,eventAction.dataset.eventId);return}
     const commentSend=e.target.closest('[data-comment-send]'); if(commentSend){track('comment_send_click');showToast('Commentaire bientôt connecté');return}
     const favBtn=e.target.closest('[data-fav]'); if(favBtn){e.preventDefault();e.stopPropagation();toggleFavorite(favBtn.dataset.fav,favBtn);return}
-    const category=e.target.closest('[data-category]'); if(category){track('category_click',{category:category.dataset.category});showToast(`${category.dataset.category} arrive bientôt`);return}
+    const category=e.target.closest('[data-category]'); if(category){setActiveCategory(category.dataset.category);return}
     const ctaLink=e.target.closest('[data-track-cta]'); if(ctaLink){const item=findItemById(ctaLink.dataset.eventId||''); track('event_cta_click',{cta:ctaLink.dataset.trackCta,id:ctaLink.dataset.eventId,title:item?.title});return}
     const card=e.target.closest('[data-open-id]'); if(card){openDetail(card.dataset.openId);return}
     const toastTarget=e.target.closest('[data-toast]'); if(toastTarget) showToast(toastTarget.dataset.toast);

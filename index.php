@@ -33,7 +33,9 @@ require_once __DIR__ . '/auth_config.php';
     .section-link{border:0;background:transparent;color:var(--blue);font-size:12px;font-weight:850;cursor:pointer;padding:0}
     .h-scroll{display:flex;gap:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 2px 12px;margin:0 -2px}
     .h-scroll::-webkit-scrollbar{display:none}
-    .category-card{min-width:132px;height:94px;border:0;cursor:pointer;text-align:left;border-radius:22px;padding:14px;color:#fff;overflow:hidden;position:relative;box-shadow:0 12px 24px rgba(11,108,255,.16);background-size:cover;background-position:center}
+    .category-card{min-width:132px;height:94px;border:0;cursor:pointer;text-align:left;border-radius:22px;padding:14px;color:#fff;overflow:hidden;position:relative;box-shadow:0 12px 24px rgba(11,108,255,.16);background-size:cover;background-position:center;transition:transform .18s ease,box-shadow .18s ease,outline .18s ease;outline:3px solid transparent;outline-offset:2px}
+    .category-card.category-active{outline:3px solid var(--blue);box-shadow:0 12px 28px rgba(11,108,255,.38);transform:scale(1.04)}
+    .category-card:not(.category-active):hover{transform:scale(1.03)}
     .category-card:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.52));z-index:0}
     .category-title{display:block;font-size:16px;font-weight:950;letter-spacing:-.2px;position:absolute;left:14px;bottom:13px;z-index:1;text-shadow:0 2px 10px rgba(0,0,0,.35)}
     .spotlight-intro{margin:8px 0 12px}
