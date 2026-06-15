@@ -738,9 +738,10 @@ function setDetailTab(tab, scroll=true){
   $all('.detail-tab').forEach(b=>b.classList.toggle('active',b.dataset.detailTab===tab));
   if(scroll){
     const slider=$('#detailSlider');
-    const panels=Array.from(slider?.querySelectorAll('.detail-panel')||[]);
-    const idx=panels.findIndex(p=>p.dataset.panel===tab);
-    if(idx>=0&&slider) slider.scrollTo({left:idx*slider.clientWidth,behavior:'smooth'});
+    if(slider){
+      const panel=slider.querySelector(`[data-panel="${tab}"]`);
+      if(panel){const sr=slider.getBoundingClientRect(),pr=panel.getBoundingClientRect();slider.scrollTo({left:slider.scrollLeft+(pr.left-sr.left),behavior:'smooth'});}
+    }
   }
   const itemId=$('#detailOverlay [data-fav]')?.dataset.fav||'';
   const item=findItemById(itemId);
