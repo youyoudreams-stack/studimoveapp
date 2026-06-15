@@ -740,18 +740,36 @@ function bindGallerySwipe(){
   },{passive:true});
 }
 // ── Booking module ──
-const bookingState={item:null,step:1,qty:1,options:new Set(),transport:null,payMode:'card'};
-function bookingTotal(){
-  const {item,qty,options,transport}=bookingState;
-  const b=item?.booking; if(!b) return 0;
-  let t=b.base_price*qty;
-  options.forEach(id=>{const o=b.options?.find(o=>o.id===id);if(o)t+=o.price*qty;});
-  if(transport&&transport!=='self'){const tr=b.transport?.find(r=>r.id===transport);if(tr)t+=tr.price*qty;}
-  return t;
+// bookingState.participants = [{civility,firstName,lastName,email,student,options:Set,transport}]
+const bookingState={
+  item:null, step:1, qty:1, payMode:'card',
+  participants:[], // filled in step 2
+  activeParticipant:0, // which participant is being configured in step 3
+};
+
+function bkParticipantTotal(p){
+  const b=bookingState.item?.booking; if(!b) return 0;
+  const student=p.student!==false;
+  let t=b.base_price*(student?1:1.2);
+  p.options?.forEach(id=>{const o=b.options?.find(o=>o.id===id);if(o)t+=o.price;});
+  if(p.transport&&p.transport!=='self'){const tr=b.transport?.find(r=>r.id===p.transport);if(tr)t+=tr.price;}
+  return Math.round(t);
 }
+function bkGrandTotal(){
+  return bookingState.participants.reduce((s,p)=>s+bkParticipantTotal(p),0);
+}
+function bkInitParticipants(qty){
+  const prev=bookingState.participants;
+  bookingState.participants=Array.from({length:qty},(_,i)=>prev[i]||{
+    civility:'M.',firstName:'',lastName:'',email:'',student:true,
+    options:new Set(),transport:bookingState.item?.booking?.transport?.[0]?.id||null
+  });
+}
+
 function openBooking(itemId){
   const item=findItemById(itemId); if(!item||!item.booking) return showToast('Billetterie bientôt disponible');
-  Object.assign(bookingState,{item,step:1,qty:1,options:new Set(),transport:item.booking.transport?.[0]?.id||null,payMode:'card'});
+  bookingState.item=item; bookingState.step=1; bookingState.qty=1; bookingState.payMode='card'; bookingState.activeParticipant=0;
+  bkInitParticipants(1);
   const o=$('#bookingOverlay'); o.classList.add('open'); o.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
   renderBookingContent();
 }
@@ -759,96 +777,288 @@ function closeBooking(){
   const o=$('#bookingOverlay'); o.classList.remove('open'); o.setAttribute('aria-hidden','true'); document.body.style.overflow='';
 }
 function renderBookingContent(){
-  const fns=[null,renderBookingStep1,renderBookingStep2,renderBookingStep3,renderBookingStep4];
+  const fns=[null,renderBkStep1,renderBkStep2,renderBkStep3,renderBkStep4,renderBkStep5];
   $('#bookingBody').innerHTML=fns[bookingState.step]();
   $all('.bk-prog-dot').forEach((d,i)=>d.classList.toggle('active',i<bookingState.step));
   bindBookingInner();
 }
-function renderBookingStep1(){
-  const {item,qty,options,transport}=bookingState;
+
+// Step 1 — nombre de participants
+function renderBkStep1(){
+  const {item,qty}=bookingState;
+  return `<div class="bk-event-head">
+    <div class="bk-event-thumb" style="background-image:url('${item.hero_image||item.image}')"></div>
+    <div class="bk-event-info">
+      <div class="bk-event-name">${escapeHtml(item.title)}</div>
+      <div class="bk-event-meta">${escapeHtml(item.date||'')}${item.place?' · '+escapeHtml(item.place):''}</div>
+    </div>
+  </div>
+  <div class="bk-section">
+    <div class="bk-section-title">Combien de participants ?</div>
+    <div class="bk-qty-big">
+      <button class="bk-qty-btn" id="bkMinus">−</button>
+      <div class="bk-qty-display">
+        <span class="bk-qty-num" id="bkQtyVal">${qty}</span>
+        <span class="bk-qty-label-sm">${qty>1?'participants':'participant'}</span>
+      </div>
+      <button class="bk-qty-btn" id="bkPlus">+</button>
+    </div>
+    <p class="bk-qty-hint">Maximum 6 places par commande</p>
+  </div>
+  <div class="bk-price-preview">
+    <span>Prix de base</span>
+    <strong>${bookingState.item.booking.base_price}€ <small>/ pers.</small></strong>
+  </div>
+  <div class="bk-footer">
+    <div class="bk-total"><div class="bk-total-label">Estimation</div><div class="bk-total-price" id="bkTotalVal">${bookingState.item.booking.base_price*qty}€</div></div>
+    <button class="bk-cta" id="bkNext1">Continuer →</button>
+  </div>`;
+}
+
+// Step 2 — fiches participants
+function renderBkStep2(){
+  const {participants}=bookingState;
+  const cards=participants.map((p,i)=>`
+    <div class="bk-participant-card" id="bkPCard${i}">
+      <div class="bk-pcard-header" data-bk-toggle="${i}">
+        <div class="bk-pcard-avatar">${i+1}</div>
+        <div class="bk-pcard-label">
+          <strong>${p.firstName?escapeHtml(p.firstName+' '+p.lastName):'Participant '+(i+1)}</strong>
+          <span>${p.email||'Infos à renseigner'}</span>
+        </div>
+        <div class="bk-pcard-arrow ${i===0?'open':''}">›</div>
+      </div>
+      <div class="bk-pcard-body" style="${i===0?'':'display:none'}">
+        <div class="bk-civil-row">
+          <label class="bk-civil-opt ${p.civility==='M.'?'selected':''}"><input type="radio" name="civ${i}" value="M." ${p.civility==='M.'?'checked':''}> M.</label>
+          <label class="bk-civil-opt ${p.civility==='Mme'?'selected':''}"><input type="radio" name="civ${i}" value="Mme" ${p.civility==='Mme'?'checked':''}> Mme</label>
+        </div>
+        <div class="bk-fields-row">
+          <div class="bk-field"><label>Prénom</label><input class="bk-input" type="text" data-pfield="${i}-firstName" value="${escapeHtml(p.firstName)}" placeholder="Léa" autocomplete="given-name"></div>
+          <div class="bk-field"><label>Nom</label><input class="bk-input" type="text" data-pfield="${i}-lastName" value="${escapeHtml(p.lastName)}" placeholder="Martin" autocomplete="family-name"></div>
+        </div>
+        <div class="bk-field"><label>Email</label><input class="bk-input" type="email" data-pfield="${i}-email" value="${escapeHtml(p.email)}" placeholder="lea@email.fr" autocomplete="email"></div>
+        <div class="bk-status-row">
+          <span class="bk-status-label">Statut</span>
+          <label class="bk-status-opt ${p.student!==false?'selected':''}"><input type="radio" name="stu${i}" value="student" ${p.student!==false?'checked':''}> Étudiant(e)</label>
+          <label class="bk-status-opt ${p.student===false?'selected':''}"><input type="radio" name="stu${i}" value="other" ${p.student===false?'checked':''}> Non étudiant(e)</label>
+        </div>
+        ${p.student===false?'<div class="bk-status-note">ℹ️ Tarif non-étudiant : +20%</div>':''}
+      </div>
+    </div>`).join('');
+  return `<div class="bk-section-title" style="margin-bottom:14px">Informations des participants</div>
+  ${cards}
+  <div class="bk-footer">
+    <button class="bk-back" id="bkBack2">← Retour</button>
+    <button class="bk-cta" id="bkNext2">Options →</button>
+  </div>`;
+}
+
+// Step 3 — options par participant (avec navigation)
+function renderBkStep3(){
+  const {participants,activeParticipant:ai,item}=bookingState;
+  const p=participants[ai];
   const b=item.booking;
-  const total=bookingTotal();
-  const opts=b.options?.map(o=>`<label class="bk-opt-row"><input type="checkbox" class="bk-opt-cb" data-opt="${o.id}" ${options.has(o.id)?'checked':''}><span class="bk-opt-ico">${o.emoji}</span><span class="bk-opt-label">${escapeHtml(o.label)}</span><span class="bk-opt-price">+${o.price}€<small>/pers.</small></span></label>`).join('')||'';
-  const trans=b.transport?.map(t=>`<label class="bk-transport-row ${transport===t.id?'selected':''}"><input type="radio" name="bk_transport" class="bk-transport-radio" data-tid="${t.id}" ${transport===t.id?'checked':''}><span class="bk-transport-label">${escapeHtml(t.label)}</span><span class="bk-transport-price">${t.price>0?'+'+t.price+'€':'Inclus'}</span></label>`).join('')||'';
-  return `<div class="bk-event-head"><div class="bk-event-thumb" style="background-image:url('${item.hero_image||item.image}')"></div><div class="bk-event-info"><div class="bk-event-name">${escapeHtml(item.title)}</div><div class="bk-event-meta">${escapeHtml(item.date||'')}${item.place?' · '+escapeHtml(item.place):''}</div></div></div>
-  <div class="bk-section"><div class="bk-section-title">Nombre de places</div><div class="bk-qty-row"><button class="bk-qty-btn" id="bkMinus">−</button><span class="bk-qty-val" id="bkQtyVal">${qty}</span><button class="bk-qty-btn" id="bkPlus">+</button><span class="bk-qty-hint">max. 6 par commande</span></div></div>
+  const opts=b.options?.map(o=>`
+    <label class="bk-opt-row ${p.options.has(o.id)?'selected':''}">
+      <input type="checkbox" class="bk-opt-cb" data-pi="${ai}" data-opt="${o.id}" ${p.options.has(o.id)?'checked':''}>
+      <span class="bk-opt-emoji">${o.emoji}</span>
+      <div class="bk-opt-info"><div class="bk-opt-label">${escapeHtml(o.label)}</div><div class="bk-opt-price">+${o.price}€ / pers.</div></div>
+      <div class="bk-opt-check"></div>
+    </label>`).join('')||'';
+  const trans=b.transport?.map(t=>`
+    <label class="bk-transport-row ${p.transport===t.id?'selected':''}">
+      <input type="radio" name="bk_transport_${ai}" class="bk-transport-radio" data-pi="${ai}" data-tid="${t.id}" ${p.transport===t.id?'checked':''}>
+      <div class="bk-radio"></div>
+      <span class="bk-transport-label">${escapeHtml(t.label)}</span>
+      <span class="bk-transport-price">${t.price>0?'+'+t.price+'€':'Inclus'}</span>
+    </label>`).join('')||'';
+  const nav=participants.length>1?`<div class="bk-p-nav">
+    ${participants.map((_,i)=>`<button class="bk-p-nav-dot ${i===ai?'active':''}" data-bk-pi="${i}">${i+1}</button>`).join('')}
+  </div>`:'';
+  const pName=p.firstName||`Participant ${ai+1}`;
+  return `<div class="bk-p-header">
+    <div class="bk-p-avatar">${ai+1}</div>
+    <div><div class="bk-p-name">${escapeHtml(pName)}</div><div class="bk-p-sub">${p.student!==false?'Étudiant(e)':'Non étudiant(e)'}</div></div>
+    ${nav}
+  </div>
   ${opts?`<div class="bk-section"><div class="bk-section-title">Options</div>${opts}</div>`:''}
   ${trans?`<div class="bk-section"><div class="bk-section-title">Transport</div>${trans}</div>`:''}
-  <div class="bk-footer"><div class="bk-total-row"><span>Total estimé</span><strong class="bk-total-price" id="bkTotalVal">${total}€</strong></div><button class="bk-cta" id="bkNext1">Continuer →</button></div>`;
+  <div class="bk-footer">
+    <button class="bk-back" id="bkBack3">← Retour</button>
+    <div class="bk-total"><div class="bk-total-label">Ce participant</div><div class="bk-total-price" id="bkPTotal">${bkParticipantTotal(p)}€</div></div>
+    ${ai<participants.length-1
+      ?`<button class="bk-cta" id="bkNextP">Suivant →</button>`
+      :`<button class="bk-cta" id="bkNext3">Récap →</button>`}
+  </div>`;
 }
-function renderBookingStep2(){
-  const {item,payMode}=bookingState;
-  const b=item.booking; const total=bookingTotal();
+
+// Step 4 — récapitulatif & paiement
+function renderBkStep4(){
+  const {participants,item,payMode}=bookingState;
+  const b=item.booking; const total=bkGrandTotal();
   const isVoyage=item.category==='Voyage'; const allow3x=total>=100;
-  const lines=[`${bookingState.qty} place${bookingState.qty>1?'s':''} — ${b.base_price}€/pers.`,...Array.from(bookingState.options).map(id=>{const o=b.options?.find(o=>o.id===id);return o?`${o.label} — +${o.price}€/pers.`:''}).filter(Boolean),...(bookingState.transport&&bookingState.transport!=='self'?[b.transport?.find(t=>t.id===bookingState.transport)].filter(Boolean).map(t=>`Transport ${t.label} — +${t.price}€`):[] )];
-  return `<div class="bk-section"><div class="bk-section-title">Récapitulatif</div><div class="bk-summary">${lines.map(l=>`<div class="bk-summary-line">${escapeHtml(l)}</div>`).join('')}<div class="bk-summary-total">Total <strong>${total}€</strong></div></div></div>
-  <div class="bk-section"><div class="bk-section-title">Mode de paiement</div>
-  <label class="bk-pay-opt ${payMode==='card'?'selected':''}"><input type="radio" name="bkPay" class="bk-pay-radio" value="card" ${payMode==='card'?'checked':''}><span class="bk-pay-ico">💳</span><div><strong>Carte bancaire</strong><small>Visa · Mastercard · CB</small></div></label>
-  ${isVoyage?`<label class="bk-pay-opt ${payMode==='ancv'?'selected':''}"><input type="radio" name="bkPay" class="bk-pay-radio" value="ancv" ${payMode==='ancv'?'checked':''}><span class="bk-pay-ico">🏖️</span><div><strong>ANCV Connect</strong><small>Chèques-vacances dématérialisés</small></div></label>`:''}
-  ${allow3x?`<label class="bk-pay-opt ${payMode==='3x'?'selected':''}"><input type="radio" name="bkPay" class="bk-pay-radio" value="3x" ${payMode==='3x'?'checked':''}><span class="bk-pay-ico">📅</span><div><strong>Payer en 3×</strong><small>${Math.ceil(total/3)}€ × 3 — sans frais</small></div></label>`:''}
+  const rows=participants.map((p,i)=>{
+    const name=p.firstName?escapeHtml(p.firstName+' '+p.lastName):`Participant ${i+1}`;
+    const extras=[...Array.from(p.options).map(id=>{const o=b.options?.find(o=>o.id===id);return o?o.label:''}).filter(Boolean)];
+    if(p.transport&&p.transport!=='self'){const tr=b.transport?.find(r=>r.id===p.transport);if(tr)extras.push(tr.label);}
+    return `<div class="bk-recap-row">
+      <div class="bk-recap-num">${i+1}</div>
+      <div class="bk-recap-info">
+        <div class="bk-recap-name">${name} ${p.student===false?'<span class="bk-tag-other">Non étud.</span>':''}</div>
+        ${extras.length?`<div class="bk-recap-extras">${extras.map(e=>`<span>${escapeHtml(e)}</span>`).join('')}</div>`:''}
+      </div>
+      <div class="bk-recap-price">${bkParticipantTotal(p)}€</div>
+    </div>`;
+  }).join('');
+  return `<div class="bk-section-title" style="margin-bottom:14px">Récapitulatif</div>
+  <div class="bk-recap-list">${rows}</div>
+  <div class="bk-recap-total"><span>Total</span><strong>${total}€</strong></div>
+  <div class="bk-section" style="margin-top:18px">
+    <div class="bk-section-title">Mode de paiement</div>
+    <label class="bk-pay-opt ${payMode==='card'?'selected':''}"><input type="radio" name="bkPay" class="bk-pay-radio" value="card" ${payMode==='card'?'checked':''}><span class="bk-pay-icon">💳</span><div class="bk-pay-info"><div class="bk-pay-label">Carte bancaire</div><div class="bk-pay-sub">Visa · Mastercard · CB</div></div></label>
+    ${isVoyage?`<label class="bk-pay-opt ${payMode==='ancv'?'selected':''}"><input type="radio" name="bkPay" class="bk-pay-radio" value="ancv" ${payMode==='ancv'?'checked':''}><span class="bk-pay-icon">🏖️</span><div class="bk-pay-info"><div class="bk-pay-label">ANCV Connect</div><div class="bk-pay-sub">Chèques-vacances dématérialisés</div></div></label>`:''}
+    ${allow3x?`<label class="bk-pay-opt ${payMode==='3x'?'selected':''}"><input type="radio" name="bkPay" class="bk-pay-radio" value="3x" ${payMode==='3x'?'checked':''}><span class="bk-pay-icon">📅</span><div class="bk-pay-info"><div class="bk-pay-label">Payer en 3×</div><div class="bk-pay-sub">${Math.ceil(total/3)}€ × 3 — sans frais</div></div></label>`:''}
   </div>
-  <div class="bk-footer"><button class="bk-cta" id="bkNext2">Procéder au paiement →</button><button class="bk-back" id="bkBack2">← Retour</button></div>`;
+  <div class="bk-footer">
+    <button class="bk-back" id="bkBack4">← Retour</button>
+    <button class="bk-cta" id="bkNext4">Payer →</button>
+  </div>`;
 }
-function renderBookingStep3(){
-  const {payMode}=bookingState; const total=bookingTotal();
-  if(payMode==='ancv') return `<div class="bk-section bk-ancv-block"><div class="bk-ancv-logo">🏖️</div><div class="bk-section-title" style="text-align:center">ANCV Connect</div><p class="bk-ancv-text">Tu vas être redirigé vers l'application ANCV Connect pour valider ton paiement avec tes chèques-vacances dématérialisés.</p><div class="bk-ancv-amount">${total}€ à régler</div></div><div class="bk-footer"><button class="bk-cta" id="bkPay">Ouvrir ANCV Connect →</button><button class="bk-back" id="bkBack3">← Retour</button></div>`;
+
+// Step 5 — paiement CB / ANCV → confirmation
+function renderBkStep5(){
+  const {payMode}=bookingState; const total=bkGrandTotal();
+  if(payMode==='ancv') return `<div class="bk-ancv-msg">
+    <div class="bk-ancv-emoji">🏖️</div>
+    <div class="bk-ancv-title">ANCV Connect</div>
+    <div class="bk-ancv-text">Tu vas être redirigé vers ANCV Connect pour valider ton paiement avec tes chèques-vacances dématérialisés.<br><br><strong>${total}€ à régler</strong></div>
+  </div>
+  <div class="bk-footer"><button class="bk-back" id="bkBack5">← Retour</button><button class="bk-cta" id="bkPay">Ouvrir ANCV →</button></div>`;
   const inst=Math.ceil(total/3); const lbl=payMode==='3x'?`${inst}€ — 1ère échéance`:`${total}€`;
-  return `<div class="bk-section"><div class="bk-section-title">Carte bancaire</div>
-  <div class="bk-card-form">
+  return `<div class="bk-section">
+    <div class="bk-section-title">Carte bancaire</div>
     <div class="bk-field"><label>Numéro de carte</label><input class="bk-input" id="bkCardNum" type="text" inputmode="numeric" maxlength="19" placeholder="1234 5678 9012 3456"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="bk-field"><label>Expiration</label><input class="bk-input" id="bkExpiry" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA"></div><div class="bk-field"><label>CVV</label><input class="bk-input" id="bkCvv" type="text" inputmode="numeric" maxlength="3" placeholder="123"></div></div>
+    <div class="bk-fields-row">
+      <div class="bk-field"><label>Expiration</label><input class="bk-input" id="bkExpiry" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA"></div>
+      <div class="bk-field"><label>CVV</label><input class="bk-input" id="bkCvv" type="text" inputmode="numeric" maxlength="3" placeholder="123"></div>
+    </div>
     <div class="bk-field"><label>Nom sur la carte</label><input class="bk-input" id="bkCardName" type="text" placeholder="JEAN DUPONT" style="text-transform:uppercase"></div>
+    ${payMode==='3x'?`<div class="bk-3x-info">📅 3 prélèvements de <strong>${inst}€</strong> — sans frais</div>`:''}
+    <div class="bk-secure-note">🔒 Paiement 100% sécurisé — SSL 256 bits</div>
   </div>
-  ${payMode==='3x'?`<div class="bk-3x-info">📅 3 prélèvements de <strong>${inst}€</strong> — sans frais</div>`:''}
-  <div class="bk-secure">🔒 Paiement 100% sécurisé — Chiffrement SSL 256 bits</div></div>
-  <div class="bk-footer"><button class="bk-cta" id="bkPay">Confirmer · ${lbl}</button><button class="bk-back" id="bkBack3">← Retour</button></div>`;
+  <div class="bk-footer"><button class="bk-back" id="bkBack5">← Retour</button><button class="bk-cta" id="bkPay">Confirmer · ${lbl}</button></div>`;
 }
-function renderBookingStep4(){
-  const {item,qty}=bookingState; const total=bookingTotal();
-  const ref='SMV-'+Math.random().toString(36).substr(2,6).toUpperCase();
-  const slots=qty>1?Array.from({length:qty-1},(_,i)=>`<div class="bk-friend-slot"><div class="bk-friend-num">🎟️ Place ${i+2}</div><input class="bk-input" type="text" placeholder="Prénom de ton ami(e)" id="bkFriend${i}"><div class="bk-friend-btns"><button class="bk-share wa" onclick="showToast('Lien WhatsApp envoyé 📱')">📱 WhatsApp</button><button class="bk-share em" onclick="showToast('Lien email envoyé ✉️')">✉️ Email</button></div></div>`).join(''):'';
-  return `<div class="bk-success"><div class="bk-check">✓</div><h2 class="bk-success-title">Réservation confirmée !</h2><div class="bk-ref">Réf. ${ref}</div><p class="bk-success-sub">Un email de confirmation a été envoyé. Retrouve ta réservation dans <strong>Mon Profil</strong>.</p></div>
-  ${qty>1?`<div class="bk-section"><div class="bk-section-title">Inviter tes accompagnants</div><p class="bk-friend-intro">Tu as pris ${qty} places. Envoie un lien personnalisé à chaque ami pour qu'il récupère sa place.</p>${slots}</div>`:``}
-  <div class="bk-footer"><button class="bk-cta" id="bkDone">Terminé</button></div>`;
-}
+
 function bindBookingInner(){
   const on=(id,fn)=>{const el=$('#'+id);if(el)el.addEventListener('click',fn);};
-  on('bkMinus',()=>{if(bookingState.qty>1){bookingState.qty--;updateBookingQty();}});
-  on('bkPlus',()=>{if(bookingState.qty<6){bookingState.qty++;updateBookingQty();}});
-  on('bkNext1',()=>{bookingState.step=2;renderBookingContent();});
-  on('bkBack2',()=>{bookingState.step=1;renderBookingContent();});
-  on('bkNext2',()=>{bookingState.step=3;renderBookingContent();});
-  on('bkBack3',()=>{bookingState.step=2;renderBookingContent();});
-  on('bkPay',()=>{
-    const btn=$('#bkPay');if(!btn)return;
-    btn.textContent='Paiement en cours…';btn.disabled=true;
-    setTimeout(()=>{bookingState.step=4;renderBookingContent();state.eventActions[bookingState.item?.id]='join';renderFeed();},1800);
+  // Step 1
+  on('bkMinus',()=>{
+    if(bookingState.qty>1){bookingState.qty--;bkInitParticipants(bookingState.qty);}
+    const v=$('#bkQtyVal');if(v){v.textContent=bookingState.qty;v.nextElementSibling.textContent=bookingState.qty>1?'participants':'participant';}
+    const t=$('#bkTotalVal');if(t)t.textContent=bookingState.item.booking.base_price*bookingState.qty+'€';
   });
-  on('bkDone',()=>{closeBooking();showToast('Tu es inscrit(e) 🎉 Retrouve ta place dans Mes Réservations');});
+  on('bkPlus',()=>{
+    if(bookingState.qty<6){bookingState.qty++;bkInitParticipants(bookingState.qty);}
+    const v=$('#bkQtyVal');if(v){v.textContent=bookingState.qty;v.nextElementSibling.textContent=bookingState.qty>1?'participants':'participant';}
+    const t=$('#bkTotalVal');if(t)t.textContent=bookingState.item.booking.base_price*bookingState.qty+'€';
+  });
+  on('bkNext1',()=>{bookingState.step=2;renderBookingContent();});
+  // Step 2 — accordion toggle
+  $all('[data-bk-toggle]').forEach(h=>h.addEventListener('click',()=>{
+    const i=+h.dataset.bkToggle;
+    const body=$(`#bkPCard${i} .bk-pcard-body`);
+    const arrow=$(`#bkPCard${i} .bk-pcard-arrow`);
+    const open=body.style.display!=='none';
+    body.style.display=open?'none':'block';
+    arrow.classList.toggle('open',!open);
+  }));
+  // Save participant fields on input
+  $all('[data-pfield]').forEach(inp=>inp.addEventListener('input',()=>{
+    const [idx,field]=inp.dataset.pfield.split('-');
+    bookingState.participants[+idx][field]=inp.value;
+    // Update accordion header
+    const p=bookingState.participants[+idx];
+    const hdr=$(`#bkPCard${idx} strong`);
+    if(hdr)hdr.textContent=p.firstName?p.firstName+' '+p.lastName:`Participant ${+idx+1}`;
+    const sub=$(`#bkPCard${idx} span`);
+    if(sub)sub.textContent=p.email||'Infos à renseigner';
+  }));
+  // Civility radios
+  $all('[name^="civ"]').forEach(r=>r.addEventListener('change',()=>{
+    const i=+r.name.replace('civ','');
+    bookingState.participants[i].civility=r.value;
+    $all(`[name="civ${i}"]`).forEach(x=>x.closest('label').classList.toggle('selected',x.value===r.value));
+  }));
+  // Student status radios
+  $all('[name^="stu"]').forEach(r=>r.addEventListener('change',()=>{
+    const i=+r.name.replace('stu','');
+    bookingState.participants[i].student=r.value==='student';
+    $all(`[name="stu${i}"]`).forEach(x=>x.closest('label').classList.toggle('selected',x.value===r.value));
+  }));
+  on('bkBack2',()=>{bookingState.step=1;renderBookingContent();});
+  on('bkNext2',()=>{bookingState.step=3;bookingState.activeParticipant=0;renderBookingContent();});
+  // Step 3 — participant nav dots
+  $all('[data-bk-pi]').forEach(btn=>btn.addEventListener('click',()=>{
+    bookingState.activeParticipant=+btn.dataset.bkPi;renderBookingContent();
+  }));
+  // Options checkboxes
   $all('.bk-opt-cb').forEach(cb=>cb.addEventListener('change',()=>{
-    cb.checked?bookingState.options.add(cb.dataset.opt):bookingState.options.delete(cb.dataset.opt);
-    updateBookingTotal();
+    const pi=+cb.dataset.pi;
+    cb.checked?bookingState.participants[pi].options.add(cb.dataset.opt):bookingState.participants[pi].options.delete(cb.dataset.opt);
+    cb.closest('.bk-opt-row').classList.toggle('selected',cb.checked);
+    const t=$('#bkPTotal');if(t)t.textContent=bkParticipantTotal(bookingState.participants[pi])+'€';
   }));
+  // Transport radios
   $all('.bk-transport-radio').forEach(r=>r.addEventListener('change',()=>{
-    bookingState.transport=r.dataset.tid;
-    $all('.bk-transport-row').forEach(row=>row.classList.toggle('selected',row.querySelector('input')?.dataset.tid===r.dataset.tid));
-    updateBookingTotal();
+    const pi=+r.dataset.pi;
+    bookingState.participants[pi].transport=r.dataset.tid;
+    $all(`[name="bk_transport_${pi}"]`).forEach(x=>x.closest('.bk-transport-row').classList.toggle('selected',x.dataset.tid===r.dataset.tid));
+    const t=$('#bkPTotal');if(t)t.textContent=bkParticipantTotal(bookingState.participants[pi])+'€';
   }));
+  on('bkBack3',()=>{bookingState.step=2;renderBookingContent();});
+  on('bkNextP',()=>{bookingState.activeParticipant++;renderBookingContent();});
+  on('bkNext3',()=>{bookingState.step=4;renderBookingContent();});
+  // Step 4 — payment mode
   $all('.bk-pay-radio').forEach(r=>r.addEventListener('change',()=>{
     bookingState.payMode=r.value;
     $all('.bk-pay-opt').forEach(o=>o.classList.toggle('selected',o.querySelector('input')?.value===r.value));
   }));
+  on('bkBack4',()=>{bookingState.step=3;bookingState.activeParticipant=bookingState.participants.length-1;renderBookingContent();});
+  on('bkNext4',()=>{bookingState.step=5;renderBookingContent();});
+  // Step 5 — card formatting & pay
   const cn=$('#bkCardNum');
   if(cn) cn.addEventListener('input',()=>{let v=cn.value.replace(/\D/g,'').substr(0,16);cn.value=v.replace(/(.{4})/g,'$1 ').trim();});
   const ex=$('#bkExpiry');
   if(ex) ex.addEventListener('input',()=>{let v=ex.value.replace(/\D/g,'');if(v.length>=2)v=v.substr(0,2)+'/'+v.substr(2,2);ex.value=v;});
-}
-function updateBookingQty(){
-  const el=$('#bkQtyVal');if(el)el.textContent=bookingState.qty;
-  updateBookingTotal();
-}
-function updateBookingTotal(){
-  const el=$('#bkTotalVal');if(el)el.textContent=bookingTotal()+'€';
+  on('bkBack5',()=>{bookingState.step=4;renderBookingContent();});
+  on('bkPay',()=>{
+    const btn=$('#bkPay');if(!btn)return;
+    btn.textContent='Paiement en cours…';btn.disabled=true;
+    setTimeout(()=>{
+      // Confirmation inline
+      $('#bookingBody').innerHTML=`<div class="bk-success">
+        <div class="bk-success-icon">✓</div>
+        <h2 class="bk-success-title">Réservation confirmée !</h2>
+        <div class="bk-success-ref">Réf. SMV-${Math.random().toString(36).substr(2,6).toUpperCase()}</div>
+        <p class="bk-success-sub">Un email de confirmation a été envoyé à chaque participant. Retrouve ta réservation dans <strong>Mon Profil</strong>.</p>
+        ${bookingState.participants.length>1?`<div class="bk-invite-section">
+          <div class="bk-invite-label">Envoyer le lien à tes accompagnants</div>
+          ${bookingState.participants.slice(1).map((p,i)=>`<div class="bk-invite-slot">
+            <div class="bk-invite-avatar">🎟️</div>
+            <div class="bk-invite-name">${p.firstName?escapeHtml(p.firstName+' '+p.lastName):`Participant ${i+2}`}</div>
+            <div class="bk-invite-actions">
+              <button class="bk-invite-btn wa" onclick="showToast('Lien WhatsApp envoyé 📱')">📱</button>
+              <button class="bk-invite-btn mail" onclick="showToast('Email envoyé ✉️')">✉️</button>
+            </div>
+          </div>`).join('')}
+        </div>`:''}
+        <div class="bk-footer"><button class="bk-cta" id="bkDone">Terminé</button></div>
+      </div>`;
+      on('bkDone',()=>{closeBooking();showToast('Tu es inscrit(e) 🎉 Retrouve ta place dans Mes Réservations');});
+      state.eventActions[bookingState.item?.id]='join'; renderFeed();
+    },1600);
+  });
 }
 // ── End booking module ──
 
