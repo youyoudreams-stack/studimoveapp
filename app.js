@@ -115,6 +115,7 @@ const DEMO_EVENTS = [
       {time:'Jour 3', title:'Journée libre & Soirée thématique', desc:"Explorez la ville à votre rythme. Le soir, soirée déguisée organisée dans un club partenaire."},
       {time:'Jour 4', title:'Clôture & Retour', desc:"Brunch de clôture, échanges de contacts et transfert aéroport. À très vite pour le prochain trip !"},
     ],
+    booking:{base_price:299,options:[{id:'single_room',emoji:'🛏️',label:'Chambre individuelle',price:80},{id:'insurance',emoji:'🛡️',label:'Assurance annulation',price:25}],transport:[{id:'paris',label:'Paris — Navette',price:35},{id:'lyon',label:'Lyon — Navette',price:25},{id:'bordeaux',label:'Bordeaux — Navette',price:25},{id:'self',label:'Je m\'organise',price:0}],ancv:true},
     ticketing_url:'#', whatsapp_url:'#',
   },
   {
@@ -135,6 +136,7 @@ const DEMO_EVENTS = [
       {time:'00h00', title:'Peak Time — 3 salles ouvertes', desc:"House, R&B et rap : chacun trouve sa salle. DJ principal en scène centrale."},
       {time:'02h30', title:'Closing Set', desc:"Le dernier set pour finir la nuit en apothéose. Fermeture 4h."},
     ],
+    booking:{base_price:12,options:[{id:'vip',emoji:'⭐',label:'Accès VIP (file prioritaire)',price:8},{id:'vestiaire',emoji:'🧥',label:'Vestiaire inclus',price:3}],transport:null,ancv:false},
     ticketing_url:'#', whatsapp_url:'#',
   },
   {
@@ -155,6 +157,7 @@ const DEMO_EVENTS = [
       {time:'13 Fév — Soirée de clôture', title:'Grande soirée finale', desc:"Le meilleur pour la fin : soirée déguisée au chalet avec DJ et bar partenaire."},
       {time:'14 Fév — Retour', title:'Départ & navette retour', desc:"Départ après petit-déjeuner. Retour dans les villes de départ."},
     ],
+    booking:{base_price:389,options:[{id:'single_room',emoji:'🛏️',label:'Chambre individuelle',price:120},{id:'insurance',emoji:'🛡️',label:'Assurance annulation',price:35},{id:'ski_rental',emoji:'⛷️',label:'Location ski & chaussures',price:80},{id:'cours',emoji:'🎿',label:'Cours collectifs (3 matins)',price:60}],transport:[{id:'paris',label:'Paris — Navette',price:45},{id:'lyon',label:'Lyon — Navette',price:25},{id:'bordeaux',label:'Bordeaux — Navette',price:35},{id:'self',label:'Je m\'organise',price:0}],ancv:true},
     ticketing_url:'#', whatsapp_url:'#',
   },
   {
@@ -736,30 +739,124 @@ function bindGallerySwipe(){
     if(Math.abs(dx)>50) galleryGoTo(galleryState.idx+(dx<0?1:-1));
   },{passive:true});
 }
+// ── Booking module ──
+const bookingState={item:null,step:1,qty:1,options:new Set(),transport:null,payMode:'card'};
+function bookingTotal(){
+  const {item,qty,options,transport}=bookingState;
+  const b=item?.booking; if(!b) return 0;
+  let t=b.base_price*qty;
+  options.forEach(id=>{const o=b.options?.find(o=>o.id===id);if(o)t+=o.price*qty;});
+  if(transport&&transport!=='self'){const tr=b.transport?.find(r=>r.id===transport);if(tr)t+=tr.price*qty;}
+  return t;
+}
+function openBooking(itemId){
+  const item=findItemById(itemId); if(!item||!item.booking) return showToast('Billetterie bientôt disponible');
+  Object.assign(bookingState,{item,step:1,qty:1,options:new Set(),transport:item.booking.transport?.[0]?.id||null,payMode:'card'});
+  const o=$('#bookingOverlay'); o.classList.add('open'); o.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
+  renderBookingContent();
+}
+function closeBooking(){
+  const o=$('#bookingOverlay'); o.classList.remove('open'); o.setAttribute('aria-hidden','true'); document.body.style.overflow='';
+}
+function renderBookingContent(){
+  const fns=[null,renderBookingStep1,renderBookingStep2,renderBookingStep3,renderBookingStep4];
+  $('#bookingBody').innerHTML=fns[bookingState.step]();
+  $all('.bk-prog-dot').forEach((d,i)=>d.classList.toggle('active',i<bookingState.step));
+  bindBookingInner();
+}
+function renderBookingStep1(){
+  const {item,qty,options,transport}=bookingState;
+  const b=item.booking;
+  const total=bookingTotal();
+  const opts=b.options?.map(o=>`<label class="bk-opt-row"><input type="checkbox" class="bk-opt-cb" data-opt="${o.id}" ${options.has(o.id)?'checked':''}><span class="bk-opt-ico">${o.emoji}</span><span class="bk-opt-label">${escapeHtml(o.label)}</span><span class="bk-opt-price">+${o.price}€<small>/pers.</small></span></label>`).join('')||'';
+  const trans=b.transport?.map(t=>`<label class="bk-transport-row ${transport===t.id?'selected':''}"><input type="radio" name="bk_transport" class="bk-transport-radio" data-tid="${t.id}" ${transport===t.id?'checked':''}><span class="bk-transport-label">${escapeHtml(t.label)}</span><span class="bk-transport-price">${t.price>0?'+'+t.price+'€':'Inclus'}</span></label>`).join('')||'';
+  return `<div class="bk-event-head"><div class="bk-event-thumb" style="background-image:url('${item.hero_image||item.image}')"></div><div class="bk-event-info"><div class="bk-event-name">${escapeHtml(item.title)}</div><div class="bk-event-meta">${escapeHtml(item.date||'')}${item.place?' · '+escapeHtml(item.place):''}</div></div></div>
+  <div class="bk-section"><div class="bk-section-title">Nombre de places</div><div class="bk-qty-row"><button class="bk-qty-btn" id="bkMinus">−</button><span class="bk-qty-val" id="bkQtyVal">${qty}</span><button class="bk-qty-btn" id="bkPlus">+</button><span class="bk-qty-hint">max. 6 par commande</span></div></div>
+  ${opts?`<div class="bk-section"><div class="bk-section-title">Options</div>${opts}</div>`:''}
+  ${trans?`<div class="bk-section"><div class="bk-section-title">Transport</div>${trans}</div>`:''}
+  <div class="bk-footer"><div class="bk-total-row"><span>Total estimé</span><strong class="bk-total-price" id="bkTotalVal">${total}€</strong></div><button class="bk-cta" id="bkNext1">Continuer →</button></div>`;
+}
+function renderBookingStep2(){
+  const {item,payMode}=bookingState;
+  const b=item.booking; const total=bookingTotal();
+  const isVoyage=item.category==='Voyage'; const allow3x=total>=100;
+  const lines=[`${bookingState.qty} place${bookingState.qty>1?'s':''} — ${b.base_price}€/pers.`,...Array.from(bookingState.options).map(id=>{const o=b.options?.find(o=>o.id===id);return o?`${o.label} — +${o.price}€/pers.`:''}).filter(Boolean),...(bookingState.transport&&bookingState.transport!=='self'?[b.transport?.find(t=>t.id===bookingState.transport)].filter(Boolean).map(t=>`Transport ${t.label} — +${t.price}€`):[] )];
+  return `<div class="bk-section"><div class="bk-section-title">Récapitulatif</div><div class="bk-summary">${lines.map(l=>`<div class="bk-summary-line">${escapeHtml(l)}</div>`).join('')}<div class="bk-summary-total">Total <strong>${total}€</strong></div></div></div>
+  <div class="bk-section"><div class="bk-section-title">Mode de paiement</div>
+  <label class="bk-pay-opt ${payMode==='card'?'selected':''}"><input type="radio" name="bkPay" class="bk-pay-radio" value="card" ${payMode==='card'?'checked':''}><span class="bk-pay-ico">💳</span><div><strong>Carte bancaire</strong><small>Visa · Mastercard · CB</small></div></label>
+  ${isVoyage?`<label class="bk-pay-opt ${payMode==='ancv'?'selected':''}"><input type="radio" name="bkPay" class="bk-pay-radio" value="ancv" ${payMode==='ancv'?'checked':''}><span class="bk-pay-ico">🏖️</span><div><strong>ANCV Connect</strong><small>Chèques-vacances dématérialisés</small></div></label>`:''}
+  ${allow3x?`<label class="bk-pay-opt ${payMode==='3x'?'selected':''}"><input type="radio" name="bkPay" class="bk-pay-radio" value="3x" ${payMode==='3x'?'checked':''}><span class="bk-pay-ico">📅</span><div><strong>Payer en 3×</strong><small>${Math.ceil(total/3)}€ × 3 — sans frais</small></div></label>`:''}
+  </div>
+  <div class="bk-footer"><button class="bk-cta" id="bkNext2">Procéder au paiement →</button><button class="bk-back" id="bkBack2">← Retour</button></div>`;
+}
+function renderBookingStep3(){
+  const {payMode}=bookingState; const total=bookingTotal();
+  if(payMode==='ancv') return `<div class="bk-section bk-ancv-block"><div class="bk-ancv-logo">🏖️</div><div class="bk-section-title" style="text-align:center">ANCV Connect</div><p class="bk-ancv-text">Tu vas être redirigé vers l'application ANCV Connect pour valider ton paiement avec tes chèques-vacances dématérialisés.</p><div class="bk-ancv-amount">${total}€ à régler</div></div><div class="bk-footer"><button class="bk-cta" id="bkPay">Ouvrir ANCV Connect →</button><button class="bk-back" id="bkBack3">← Retour</button></div>`;
+  const inst=Math.ceil(total/3); const lbl=payMode==='3x'?`${inst}€ — 1ère échéance`:`${total}€`;
+  return `<div class="bk-section"><div class="bk-section-title">Carte bancaire</div>
+  <div class="bk-card-form">
+    <div class="bk-field"><label>Numéro de carte</label><input class="bk-input" id="bkCardNum" type="text" inputmode="numeric" maxlength="19" placeholder="1234 5678 9012 3456"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="bk-field"><label>Expiration</label><input class="bk-input" id="bkExpiry" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA"></div><div class="bk-field"><label>CVV</label><input class="bk-input" id="bkCvv" type="text" inputmode="numeric" maxlength="3" placeholder="123"></div></div>
+    <div class="bk-field"><label>Nom sur la carte</label><input class="bk-input" id="bkCardName" type="text" placeholder="JEAN DUPONT" style="text-transform:uppercase"></div>
+  </div>
+  ${payMode==='3x'?`<div class="bk-3x-info">📅 3 prélèvements de <strong>${inst}€</strong> — sans frais</div>`:''}
+  <div class="bk-secure">🔒 Paiement 100% sécurisé — Chiffrement SSL 256 bits</div></div>
+  <div class="bk-footer"><button class="bk-cta" id="bkPay">Confirmer · ${lbl}</button><button class="bk-back" id="bkBack3">← Retour</button></div>`;
+}
+function renderBookingStep4(){
+  const {item,qty}=bookingState; const total=bookingTotal();
+  const ref='SMV-'+Math.random().toString(36).substr(2,6).toUpperCase();
+  const slots=qty>1?Array.from({length:qty-1},(_,i)=>`<div class="bk-friend-slot"><div class="bk-friend-num">🎟️ Place ${i+2}</div><input class="bk-input" type="text" placeholder="Prénom de ton ami(e)" id="bkFriend${i}"><div class="bk-friend-btns"><button class="bk-share wa" onclick="showToast('Lien WhatsApp envoyé 📱')">📱 WhatsApp</button><button class="bk-share em" onclick="showToast('Lien email envoyé ✉️')">✉️ Email</button></div></div>`).join(''):'';
+  return `<div class="bk-success"><div class="bk-check">✓</div><h2 class="bk-success-title">Réservation confirmée !</h2><div class="bk-ref">Réf. ${ref}</div><p class="bk-success-sub">Un email de confirmation a été envoyé. Retrouve ta réservation dans <strong>Mon Profil</strong>.</p></div>
+  ${qty>1?`<div class="bk-section"><div class="bk-section-title">Inviter tes accompagnants</div><p class="bk-friend-intro">Tu as pris ${qty} places. Envoie un lien personnalisé à chaque ami pour qu'il récupère sa place.</p>${slots}</div>`:``}
+  <div class="bk-footer"><button class="bk-cta" id="bkDone">Terminé</button></div>`;
+}
+function bindBookingInner(){
+  const on=(id,fn)=>{const el=$('#'+id);if(el)el.addEventListener('click',fn);};
+  on('bkMinus',()=>{if(bookingState.qty>1){bookingState.qty--;updateBookingQty();}});
+  on('bkPlus',()=>{if(bookingState.qty<6){bookingState.qty++;updateBookingQty();}});
+  on('bkNext1',()=>{bookingState.step=2;renderBookingContent();});
+  on('bkBack2',()=>{bookingState.step=1;renderBookingContent();});
+  on('bkNext2',()=>{bookingState.step=3;renderBookingContent();});
+  on('bkBack3',()=>{bookingState.step=2;renderBookingContent();});
+  on('bkPay',()=>{
+    const btn=$('#bkPay');if(!btn)return;
+    btn.textContent='Paiement en cours…';btn.disabled=true;
+    setTimeout(()=>{bookingState.step=4;renderBookingContent();state.eventActions[bookingState.item?.id]='join';renderFeed();},1800);
+  });
+  on('bkDone',()=>{closeBooking();showToast('Tu es inscrit(e) 🎉 Retrouve ta place dans Mes Réservations');});
+  $all('.bk-opt-cb').forEach(cb=>cb.addEventListener('change',()=>{
+    cb.checked?bookingState.options.add(cb.dataset.opt):bookingState.options.delete(cb.dataset.opt);
+    updateBookingTotal();
+  }));
+  $all('.bk-transport-radio').forEach(r=>r.addEventListener('change',()=>{
+    bookingState.transport=r.dataset.tid;
+    $all('.bk-transport-row').forEach(row=>row.classList.toggle('selected',row.querySelector('input')?.dataset.tid===r.dataset.tid));
+    updateBookingTotal();
+  }));
+  $all('.bk-pay-radio').forEach(r=>r.addEventListener('change',()=>{
+    bookingState.payMode=r.value;
+    $all('.bk-pay-opt').forEach(o=>o.classList.toggle('selected',o.querySelector('input')?.value===r.value));
+  }));
+  const cn=$('#bkCardNum');
+  if(cn) cn.addEventListener('input',()=>{let v=cn.value.replace(/\D/g,'').substr(0,16);cn.value=v.replace(/(.{4})/g,'$1 ').trim();});
+  const ex=$('#bkExpiry');
+  if(ex) ex.addEventListener('input',()=>{let v=ex.value.replace(/\D/g,'');if(v.length>=2)v=v.substr(0,2)+'/'+v.substr(2,2);ex.value=v;});
+}
+function updateBookingQty(){
+  const el=$('#bkQtyVal');if(el)el.textContent=bookingState.qty;
+  updateBookingTotal();
+}
+function updateBookingTotal(){
+  const el=$('#bkTotalVal');if(el)el.textContent=bookingTotal()+'€';
+}
+// ── End booking module ──
+
 function renderEventBox(item){
-  const hasBilletterie = item.ticketing_url && item.ticketing_url !== '#';
-  const hasWhatsApp    = item.whatsapp_url  && item.whatsapp_url  !== '#';
-
-  let ctaHtml = '';
-  if (hasBilletterie && hasWhatsApp) {
-    ctaHtml = `
-      <a class="event-cta join" href="${safeUrl(item.ticketing_url)}" target="_blank" rel="noopener" data-track-cta="billetterie" data-event-id="${escapeHtml(item.id)}">Réserver ma place</a>
-      <a class="event-cta interest" href="${safeUrl(item.whatsapp_url)}" target="_blank" rel="noopener" data-track-cta="whatsapp" data-event-id="${escapeHtml(item.id)}">Rejoindre le WhatsApp</a>`;
-  } else if (hasBilletterie) {
-    ctaHtml = `
-      <button class="event-cta interest" data-event-action="interest" data-event-id="${escapeHtml(item.id)}">Je suis intéressé</button>
-      <a class="event-cta join" href="${safeUrl(item.ticketing_url)}" target="_blank" rel="noopener" data-track-cta="billetterie" data-event-id="${escapeHtml(item.id)}">Réserver ma place</a>`;
-  } else if (hasWhatsApp) {
-    ctaHtml = `
-      <button class="event-cta interest" data-event-action="interest" data-event-id="${escapeHtml(item.id)}">Je suis intéressé</button>
-      <a class="event-cta join" href="${safeUrl(item.whatsapp_url)}" target="_blank" rel="noopener" data-track-cta="whatsapp" data-event-id="${escapeHtml(item.id)}">Rejoindre le groupe</a>`;
-  } else {
-    ctaHtml = `
-      <button class="event-cta interest" data-event-action="interest" data-event-id="${escapeHtml(item.id)}">Je suis intéressé</button>
-      <button class="event-cta join" data-event-action="join" data-event-id="${escapeHtml(item.id)}">Je participe</button>`;
-  }
-
-  return `<div class="event-cta-row premium">${ctaHtml}</div>`;
+  const interested = state.eventActions[item.id]==='interest';
+  const interestBtn = `<button class="event-cta interest${interested?' active':''}" data-event-action="interest" data-event-id="${escapeHtml(item.id)}">${interested?'✓ Intéressé':'Je suis intéressé'}</button>`;
+  const joinBtn = `<button class="event-cta join" data-open-booking="${escapeHtml(item.id)}">Je participe</button>`;
+  return `<div class="event-cta-row premium">${interestBtn}${joinBtn}</div>`;
 }
 function renderDetailPanels(item){
   const isEvent=item.type==='event';
@@ -908,11 +1005,22 @@ function bindSliderScroll(){
 }
 function handleEventAction(action,id){
   const item=findItemById(id); if(!item) return;
-  state.eventActions[id]=action;
-  if(action==='interest'){ item.interested=(item.interested||0)+1; track('event_interest_click',{id,title:item.title,entity_name:item.entity}); showToast('Ajouté aux intéressés'); }
-  if(action==='join'){ item.going=(item.going||0)+1; track('event_join_click',{id,title:item.title,entity_name:item.entity}); showToast('Participation enregistrée'); }
-  $('#detailOverlay').innerHTML=renderDetail(item);
-  renderFeed();
+  if(action==='interest'){
+    const already=state.eventActions[id]==='interest';
+    state.eventActions[id]=already?null:'interest';
+    const btn=$(`[data-event-action="interest"][data-event-id="${id}"]`);
+    if(already){
+      item.interested=Math.max(0,(item.interested||0)-1);
+      if(btn){btn.textContent='Je suis intéressé';btn.classList.remove('active');}
+      showToast('Retiré de tes intérêts');
+    } else {
+      item.interested=(item.interested||0)+1;
+      if(btn){btn.textContent='✓ Intéressé';btn.classList.add('active');}
+      showToast('Tu es maintenant intéressé(e) par cet événement 🎉');
+      track('event_interest_click',{id,title:item.title});
+    }
+    renderFeed();
+  }
 }
 function openDrawer(){ $('#drawerBackdrop').classList.add('open'); $('#drawer').classList.add('open'); $('#drawer').setAttribute('aria-hidden','false'); track('menu_open') }
 function closeDrawer(){ $('#drawerBackdrop').classList.remove('open'); $('#drawer').classList.remove('open'); $('#drawer').setAttribute('aria-hidden','true') }
@@ -1210,6 +1318,8 @@ function bindEvents(){
   $all('.feed-tab').forEach(btn=>btn.addEventListener('click',()=>setActiveFeed(btn.dataset.feed)));
   document.addEventListener('click',(e)=>{
     const closeBtn=e.target.closest('#closeDetailBtn'); if(closeBtn){closeDetail();return}
+    const closeBookingBtn=e.target.closest('#closeBookingBtn,#bookingOverlayBg'); if(closeBookingBtn){closeBooking();return}
+    const openBookingBtn=e.target.closest('[data-open-booking]'); if(openBookingBtn){openBooking(openBookingBtn.dataset.openBooking);return}
     const closeProfileBtn=e.target.closest('#closeProfileBtn'); if(closeProfileBtn){closeProfile();return}
     const closeGalleryBtn=e.target.closest('#closeGalleryBtn,#galleryOverlayBg'); if(closeGalleryBtn){closeGallery();return}
     const galleryOpen=e.target.closest('[data-open-gallery]'); if(galleryOpen){openGallery(galleryOpen.dataset.openGallery,parseInt(galleryOpen.dataset.galleryIdx||'0'));return}
