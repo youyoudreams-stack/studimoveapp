@@ -738,8 +738,9 @@ function setDetailTab(tab, scroll=true){
   $all('.detail-tab').forEach(b=>b.classList.toggle('active',b.dataset.detailTab===tab));
   if(scroll){
     const slider=$('#detailSlider');
-    const panel=slider?.querySelector(`[data-panel="${tab}"]`);
-    if(panel&&slider) slider.scrollTo({left:panel.offsetLeft,behavior:'smooth'});
+    const panels=Array.from(slider?.querySelectorAll('.detail-panel')||[]);
+    const idx=panels.findIndex(p=>p.dataset.panel===tab);
+    if(idx>=0&&slider) slider.scrollTo({left:idx*slider.clientWidth,behavior:'smooth'});
   }
   const itemId=$('#detailOverlay [data-fav]')?.dataset.fav||'';
   const item=findItemById(itemId);
@@ -754,7 +755,7 @@ function bindSliderScroll(){
   slider.addEventListener('scroll',()=>{
     const center=slider.scrollLeft+slider.clientWidth/2;
     let closest=panels[0], minDist=Infinity;
-    panels.forEach(p=>{const dist=Math.abs((p.offsetLeft+p.offsetWidth/2)-center); if(dist<minDist){minDist=dist;closest=p;}});
+    panels.forEach((p,i)=>{const dist=Math.abs(i*slider.clientWidth+slider.clientWidth/2-center); if(dist<minDist){minDist=dist;closest=p;}});
     const tab=closest.dataset.panel;
     if(tab) setDetailTab(tab, false);
     const activeBtn=document.querySelector(`.detail-tabs [data-detail-tab="${tab}"]`);
