@@ -867,6 +867,6 @@ require_once __DIR__ . '/auth_config.php';
     </div>
   </div>
   <div class="toast" id="toast"></div>
-  <script src="app.js?v=booking-v7"></script>
+  <script src="app.js?v=booking-v8"></script>
 </body>
 </html>

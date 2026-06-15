@@ -964,14 +964,24 @@ function bindBookingInner(){
     const t=$('#bkTotalVal');if(t)t.textContent=bookingState.item.booking.base_price*bookingState.qty+'€';
   });
   on('bkNext1',()=>{bookingState.step=2;renderBookingContent();});
-  // Step 2 — accordion toggle
+  // Step 2 — accordion toggle (une seule carte ouverte à la fois)
   $all('[data-bk-toggle]').forEach(h=>h.addEventListener('click',()=>{
     const i=+h.dataset.bkToggle;
-    const body=$(`#bkPCard${i} .bk-pcard-body`);
-    const arrow=$(`#bkPCard${i} .bk-pcard-arrow`);
-    const open=body.style.display!=='none';
-    body.style.display=open?'none':'block';
-    arrow.classList.toggle('open',!open);
+    const isOpen=$(`#bkPCard${i} .bk-pcard-body`).style.display!=='none';
+    // Fermer toutes
+    bookingState.participants.forEach((_,j)=>{
+      const b=$(`#bkPCard${j} .bk-pcard-body`);
+      const a=$(`#bkPCard${j} .bk-pcard-arrow`);
+      if(b){b.style.display='none';}
+      if(a)a.classList.remove('open');
+    });
+    // Ouvrir celle cliquée si elle était fermée
+    if(!isOpen){
+      const body=$(`#bkPCard${i} .bk-pcard-body`);
+      const arrow=$(`#bkPCard${i} .bk-pcard-arrow`);
+      if(body)body.style.display='block';
+      if(arrow)arrow.classList.add('open');
+    }
   }));
   // Save participant fields on input
   $all('[data-pfield]').forEach(inp=>inp.addEventListener('input',()=>{
