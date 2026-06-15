@@ -141,15 +141,20 @@ require_once __DIR__ . '/auth_config.php';
     .detail-map-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:13px;font-weight:750;color:#344054}
     .detail-map-link{color:var(--blue);font-weight:850;text-decoration:none}
     /* ── Programme timeline ── */
-    .prog-timeline{position:relative;padding-left:26px;margin-top:4px}
-    .prog-timeline:before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line);border-radius:2px}
-    .prog-item{position:relative;margin-bottom:22px}
-    .prog-item:last-child{margin-bottom:0}
-    .prog-dot{position:absolute;left:-23px;top:5px;width:12px;height:12px;border-radius:50%;background:#fff;border:2.5px solid var(--blue);box-shadow:0 0 0 3px rgba(11,108,255,.12)}
-    .prog-dot.first{background:var(--blue)}
-    .prog-time{font-size:11px;font-weight:950;color:var(--blue);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
-    .prog-title{font-size:14px;font-weight:950;color:#101828;margin-bottom:3px}
-    .prog-desc{font-size:13px;color:#667085;line-height:1.4;font-weight:600}
+    /* ── Programme timeline ── */
+    .prog-timeline{display:flex;flex-direction:column;margin-top:8px}
+    .prog-item{display:grid;grid-template-columns:44px 1fr;gap:0}
+    .prog-left{display:flex;flex-direction:column;align-items:center}
+    .prog-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:950;flex-shrink:0;z-index:1}
+    .prog-dot.step-0{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;box-shadow:0 6px 18px rgba(11,108,255,.30)}
+    .prog-dot.step-1,.prog-dot.step-2,.prog-dot.step-3{background:#eef4ff;border:2.5px solid var(--blue);color:var(--blue)}
+    .prog-line{width:2px;flex:1;min-height:12px;background:linear-gradient(180deg,rgba(11,108,255,.30) 0%,rgba(11,108,255,.08) 100%);margin:0 auto;border-radius:2px}
+    .prog-item:last-child .prog-line{visibility:hidden}
+    .prog-content{padding:6px 0 26px 14px}
+    .prog-item:last-child .prog-content{padding-bottom:6px}
+    .prog-time{font-size:10px;font-weight:950;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+    .prog-title{font-size:15px;font-weight:950;color:#101828;margin-bottom:5px;letter-spacing:-.2px}
+    .prog-desc{font-size:13px;color:#667085;line-height:1.5;font-weight:600}
     .comment-box{margin-top:14px;display:flex;gap:8px;background:#f7faff;border:1px solid var(--line);border-radius:18px;padding:8px}
     .comment-input{flex:1;border:0;background:transparent;outline:none;font-size:13px;font-weight:650;min-width:0}.comment-send{border:0;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#fff;border-radius:999px;padding:9px 12px;font-size:12px;font-weight:950;cursor:pointer}
     
@@ -700,6 +705,6 @@ require_once __DIR__ . '/auth_config.php';
     <div class="gallery-dots"></div>
   </div>
   <div class="toast" id="toast"></div>
-  <script src="app.js?v=event-detail-v4"></script>
+  <script src="app.js?v=event-detail-v5"></script>
 </body>
 </html>

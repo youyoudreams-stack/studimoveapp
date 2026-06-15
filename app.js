@@ -579,7 +579,7 @@ function renderSpotlight(){
   renderSpotlightDesktop();
 }
 
-function renderEventSocialProof(item){if(item.type!=='event')return ''; const avatars=profileImgs.map(url=>`<span class="mini-avatar" style="background-image:url('${url}')"></span>`).join(''); return `<div class="event-social-proof"><div class="avatar-stack">${avatars}</div><div class="event-counts"><span>${item.interested||0} intéressés</span><span>${item.going||0} inscrits</span></div></div>`}
+function renderEventSocialProof(item){if(item.type!=='event')return ''; const avatars=profileImgs.map(url=>`<span class="mini-avatar" style="background-image:url('${url}')"></span>`).join(''); const total=(item.interested||0)+(item.going||0); return `<div class="event-social-proof"><div class="avatar-stack">${avatars}</div><div class="event-counts"><span>${total} participants</span></div></div>`}
 function renderFeed(){
   let items=feeds[state.activeFeed]||[];
   if(state.activeCategory){
@@ -794,7 +794,7 @@ function renderDetailPanels(item){
   </div>`;
 
   const timelineHtml = programItems
-    ? `<div class="prog-timeline">${programItems.map((s,i)=>`<div class="prog-item"><div class="prog-dot ${i===0?'first':''}"></div><div class="prog-content"><div class="prog-time">${escapeHtml(s.time)}</div><div class="prog-title">${escapeHtml(s.title)}</div>${s.desc?`<div class="prog-desc">${escapeHtml(s.desc)}</div>`:''}</div></div>`).join('')}</div>`
+    ? `<div class="prog-timeline">${programItems.map((s,i)=>`<div class="prog-item"><div class="prog-left"><div class="prog-dot step-${Math.min(i,3)}">${i+1}</div><div class="prog-line"></div></div><div class="prog-content"><div class="prog-time">${escapeHtml(s.time)}</div><div class="prog-title">${escapeHtml(s.title)}</div>${s.desc?`<div class="prog-desc">${escapeHtml(s.desc)}</div>`:''}</div></div>`).join('')}</div>`
     : programText
       ? `<p class="detail-text">${escapeHtml(programText)}</p>`
       : `<p class="detail-text" style="color:#98A2B3;font-style:italic">Le programme détaillé sera publié prochainement par l'organisateur.</p>`;
