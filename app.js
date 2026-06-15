@@ -579,9 +579,25 @@ function renderFeed(){
     const isFav=state.favoriteIds.has(item.id);
     return `<article class="post-card" data-open-id="${escapeHtml(item.id)}">
       <div class="post-head"><div class="post-author"><div class="entity-logo">${escapeHtml(item.initials)}</div><div><p class="author-name">${escapeHtml(item.entity)}</p><p class="post-meta">${escapeHtml(item.meta)}</p></div></div><button class="more-btn" type="button" data-toast="Options bientôt disponibles">•••</button></div>
-      <div class="post-media"><div class="post-img" style="background-image:url('${item.image}')"></div><span class="${item.type==='event'?'event-pill':'media-badge'}">${item.type==='event'?'◷ ':''}${escapeHtml(item.badge)}</span><button class="favorite-btn ${isFav?'active':''}" type="button" data-fav="${escapeHtml(item.id)}" aria-label="Ajouter aux favoris">${favoriteIcon(isFav)}</button></div>
+      <div class="post-media"><div class="post-img" data-lazybg="${escapeHtml(item.image)}"></div><span class="${item.type==='event'?'event-pill':'media-badge'}">${item.type==='event'?'◷ ':''}${escapeHtml(item.badge)}</span><button class="favorite-btn ${isFav?'active':''}" type="button" data-fav="${escapeHtml(item.id)}" aria-label="Ajouter aux favoris">${favoriteIcon(isFav)}</button></div>
       <div class="post-body"><h3 class="post-title">${escapeHtml(item.title)}</h3><p class="post-text">${escapeHtml(item.text)}</p>${renderEventSocialProof(item)}<div class="post-actions"><span class="action">♥ ${item.likes}</span><span class="action">💬 ${item.comments}</span><span class="action-spacer"></span><span class="action">➤</span></div></div>
     </article>`}).join('')
+  requestAnimationFrame(initLazyBg);
+}
+function initLazyBg(){
+  if(!('IntersectionObserver' in window)){
+    $all('[data-lazybg]').forEach(el=>{el.style.backgroundImage=`url('${el.dataset.lazybg}')`;});
+    return;
+  }
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.style.backgroundImage=`url('${e.target.dataset.lazybg}')`;
+        obs.unobserve(e.target);
+      }
+    });
+  },{rootMargin:'300px'});
+  $all('[data-lazybg]:not([style*="background-image"])').forEach(el=>obs.observe(el));
 }
 function setActiveFeed(feed){state.activeFeed=feed;$all('.feed-tab').forEach(btn=>btn.classList.toggle('active',btn.dataset.feed===feed));track('feed_tab_change',{feed_tab:feed});renderFeed()}
 function renderPeopleGrid(list, kind){
@@ -738,7 +754,6 @@ function renderDetailPanels(item){
     <div class="detail-section-card">
       <h3>Détails</h3>
       ${renderEventMetaGrid(item)}
-      ${renderEventMediaBlock(item)}
       ${item.whatsapp_url?`<a class="detail-whatsapp" href="${safeUrl(item.whatsapp_url)}" target="_blank" rel="noopener">Rejoindre le WhatsApp</a>`:''}
     </div>
   </div>`;
@@ -808,9 +823,10 @@ function renderDetail(item){
       ${subtitle?`<p class="detail-slogan">${escapeHtml(subtitle)}</p>`:''}
     </div>
 
-    <div class="detail-hero-card">
-      <div class="detail-hero premium" style="background-image:url('${hero}')"></div>
-    </div>
+    ${buildMediaItems(item).length>1
+      ?`<div class="detail-hero-card detail-hero-gallery">${renderEventMediaBlock(item)}</div>`
+      :`<div class="detail-hero-card"><div class="detail-hero premium" style="background-image:url('${hero}')"></div></div>`
+    }
 
     <div class="detail-author-card">
       <div class="entity-logo detail-org-logo">${escapeHtml(organizerLogo)}</div>

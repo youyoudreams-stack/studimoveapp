@@ -563,6 +563,19 @@ require_once __DIR__ . '/auth_config.php';
       .event-media-desktop{grid-template-columns:3fr 2fr;height:380px}
     }
 
+    /* ── Gallery in hero area ── */
+    .detail-hero-gallery{padding:0 16px;max-width:980px;margin:0 auto}
+    .detail-hero-gallery .event-media-block{margin:0}
+    .detail-hero-gallery .event-media-mobile{border-radius:28px}
+    .detail-hero-gallery .event-media-slider{border-radius:28px}
+    .detail-hero-gallery .event-media-slide,.detail-hero-gallery .gallery-item-video{height:clamp(260px,54vw,520px);border-radius:0}
+    @media(min-width:640px){
+      .detail-hero-gallery .event-media-desktop{height:clamp(300px,40vw,520px);border-radius:28px}
+    }
+    @media(min-width:860px){
+      .detail-hero-gallery .event-media-desktop{height:clamp(360px,38vw,520px)}
+    }
+
     /* ── Gallery Modal ── */
     .gallery-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.92);display:none;flex-direction:column;align-items:center;justify-content:center}
     .gallery-overlay.open{display:flex}
@@ -668,6 +681,6 @@ require_once __DIR__ . '/auth_config.php';
     <div class="gallery-dots"></div>
   </div>
   <div class="toast" id="toast"></div>
-  <script src="app.js?v=gallery-v1"></script>
+  <script src="app.js?v=gallery-hero-v2"></script>
 </body>
 </html>
