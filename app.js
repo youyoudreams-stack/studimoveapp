@@ -60,11 +60,11 @@ const img = {
   escape:'https://images.unsplash.com/photo-1560472355-536de3962603?auto=format&fit=crop&w=1200&q=80',
 };
 const people = [
-  {name:'Lina Martin', school:'Kedge · Marseille', avatar:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80'},
-  {name:'Yanis Benali', school:'Digital College · Paris', avatar:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80'},
-  {name:'Emma Leroy', school:'ESG · Bordeaux', avatar:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80'},
-  {name:'Nolan Petit', school:'Campus Paris', avatar:'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&q=80'},
-  {name:'Sofia Moreau', school:'Kedge · Marseille', avatar:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80'},
+  {id:'u1', name:'Lina Martin', username:'@lina.move', school:'Kedge · Marseille', avatar:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80', bio:'Étudiante en M2 Marketing ✨ Fan de voyages et de bonne musique 🎶', connectionStatus:'none', stats:{connections:142,events:14,badges:5}, badges:['🌍 Voyageuse','🎉 Festivalière','⭐ Early Bird'], privacy:{posts:'public',events:'public',connections:'public'}},
+  {id:'u2', name:'Yanis Benali', username:'@yanis.b', school:'Digital College · Paris', avatar:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80', bio:'Dev web & passionné de soirées 🚀 Toujours partant pour un plan 😎', connectionStatus:'pending', stats:{connections:87,events:9,badges:3}, badges:['🏆 Top connecteur','🎮 Gamer'], privacy:{posts:'public',events:'public',connections:'connections'}},
+  {id:'u3', name:'Emma Leroy', username:'@emma.leroy', school:'ESG · Bordeaux', avatar:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80', bio:'Future juriste 👩‍⚖️ Bordeaux forever 🍷 Sorties culturelles et rooftops', connectionStatus:'connected', stats:{connections:203,events:21,badges:8}, badges:['🎨 Culturelle','🍷 Bordelaise','🌟 VIP'], privacy:{posts:'connections',events:'public',connections:'public'}},
+  {id:'u4', name:'Nolan Petit', username:'@nolan.petit', school:'Campus Paris', avatar:'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&q=80', bio:'Sport & musique 🏀🎸 Toujours dispo pour sortir à Paris', connectionStatus:'none', stats:{connections:56,events:7,badges:2}, badges:['🏀 Sportif'], privacy:{posts:'public',events:'connections',connections:'connections'}},
+  {id:'u5', name:'Sofia Moreau', username:'@sofia.m', school:'Kedge · Marseille', avatar:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80', bio:'Marketing & influence 📸 Marseille dans le cœur 💙', connectionStatus:'none', stats:{connections:318,events:32,badges:11}, badges:['📸 Influenceuse','🌊 Marseillaise','🔥 Top actif'], privacy:{posts:'public',events:'public',connections:'public'}},
 ];
 const comments = [
   {name:'Lina Martin', text:"Trop chaud, ça a l'air incroyable !", time:'il y a 8 min', avatar:people[0].avatar},
@@ -574,7 +574,7 @@ function renderPeopleGrid(list, kind){
   if(!list.length) return `<p style="text-align:center;color:#98A2B3;font-size:13px;font-weight:700;padding:20px 0">Aucun participant pour l'instant</p>`;
   return `<div class="people-grid">${list.map(p=>{
     const badge = kind==='going' ? `<span class="person-card-badge going">Inscrit ✓</span>` : kind==='interested' ? `<span class="person-card-badge interested">Intéressé</span>` : '';
-    return `<div class="person-card"><div class="person-card-avatar" style="background-image:url('${p.avatar}')"></div><div class="person-card-name">${escapeHtml(p.name)}</div><div class="person-card-school">${escapeHtml(p.school)}</div>${badge}</div>`;
+    return `<div class="person-card" data-user-id="${escapeHtml(p.id||p.name)}" style="cursor:pointer"><div class="person-card-avatar" style="background-image:url('${p.avatar}')"></div><div class="person-card-name">${escapeHtml(p.name)}</div><div class="person-card-school">${escapeHtml(p.school)}</div>${badge}</div>`;
   }).join('')}</div>`;
 }
 function renderComments(){
@@ -908,11 +908,156 @@ function openReservations(targetReservationId=''){
     });
 }
 
+const mockPosts = [
+  {id:'p1',userId:'u1',text:"Barcelona c'était dingue 🌊 Les meilleures vacances de ma vie avec ces fous !",time:'il y a 2 j',likes:34,privacy:'public',img:'https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=600&q=80'},
+  {id:'p2',userId:'u1',text:"Soirée incroyable hier soir 🔥 Merci StudiMove pour l'orga !",time:'il y a 5 j',likes:18,privacy:'public'},
+  {id:'p3',userId:'u2',text:"Nouveau projet perso en cours 🚀 Hâte de vous montrer ça",time:'il y a 1 j',likes:9,privacy:'public'},
+  {id:'p4',userId:'u3',text:"Bordeaux sous le soleil ☀️ Parfait pour réviser en terrasse",time:'il y a 3 j',likes:41,privacy:'connections'},
+  {id:'p5',userId:'u4',text:"Match de basket ce weekend — qui vient ? 🏀",time:'il y a 6 j',likes:7,privacy:'public'},
+  {id:'p6',userId:'u5',text:"Paris → Marseille en avion pour le week-end, qui veut venir ? ✈️",time:'il y a 1 j',likes:62,privacy:'public',img:'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=600&q=80'},
+];
+const mockConnections = [
+  {userId:'u1',connections:['u2','u3','u5']},
+  {userId:'u2',connections:['u1','u4']},
+  {userId:'u3',connections:['u1','u5']},
+  {userId:'u4',connections:['u2']},
+  {userId:'u5',connections:['u1','u3']},
+];
+function findPersonById(id){ return people.find(p=>p.id===id)||null; }
+function getPersonConnections(userId){
+  const mc=mockConnections.find(c=>c.userId===userId);
+  if(!mc) return [];
+  return mc.connections.map(cid=>findPersonById(cid)).filter(Boolean);
+}
+function getPersonPosts(userId,viewerStatus){
+  return mockPosts.filter(p=>{
+    if(p.userId!==userId) return false;
+    if(p.privacy==='public') return true;
+    if(p.privacy==='connections'&&viewerStatus==='connected') return true;
+    return false;
+  });
+}
+function renderProfile(person){
+  const connectLabel = person.connectionStatus==='connected' ? '✓ Connecté' : person.connectionStatus==='pending' ? '⏳ En attente' : '+ Se connecter';
+  const connectClass = person.connectionStatus==='connected' ? 'connected' : person.connectionStatus==='pending' ? 'pending' : '';
+  const badgesHtml = person.badges.map(b=>`<span class="profile-badge-chip">${escapeHtml(b)}</span>`).join('');
+  const posts = getPersonPosts(person.id, person.connectionStatus);
+  const postsHtml = posts.length ? posts.map(p=>`
+    <div class="profile-post-card">
+      <div class="profile-post-header">
+        <div class="profile-post-avatar" style="background-image:url('${person.avatar}')"></div>
+        <div class="profile-post-meta"><strong>${escapeHtml(person.name)}</strong><span>${escapeHtml(p.time)}</span></div>
+      </div>
+      <div class="profile-post-text">${escapeHtml(p.text)}</div>
+      ${p.img?`<img class="profile-post-img" src="${p.img}" alt="post">`:''}
+      <div class="profile-post-privacy">${p.privacy==='connections'?'🔒 Connexions seulement':'🌍 Public'} · ❤️ ${p.likes}</div>
+    </div>`).join('') : person.privacy.posts==='connections'&&person.connectionStatus!=='connected'
+      ? `<div class="profile-privacy-lock">🔒 Les posts sont réservés aux connexions de ${escapeHtml(person.name)}</div>`
+      : `<div class="profile-empty">Aucun post pour l'instant</div>`;
+  const eventCards = spotlightItems.slice(0,3).map(ev=>`
+    <div class="profile-event-card">
+      <div class="profile-event-img" style="background-image:url('${ev.image}')"></div>
+      <div class="profile-event-info">
+        <strong>${escapeHtml(ev.title)}</strong>
+        <span>${escapeHtml(ev.date)}</span>
+        <div class="profile-event-badge">${escapeHtml(ev.tag)}</div>
+      </div>
+    </div>`).join('');
+  const eventsHtml = person.privacy.events==='connections'&&person.connectionStatus!=='connected'
+    ? `<div class="profile-privacy-lock">🔒 Les événements sont réservés aux connexions de ${escapeHtml(person.name)}</div>`
+    : eventCards;
+  const conns = getPersonConnections(person.id);
+  const connsHtml = person.privacy.connections==='connections'&&person.connectionStatus!=='connected'
+    ? `<div class="profile-privacy-lock">🔒 Les connexions sont réservées aux connexions de ${escapeHtml(person.name)}</div>`
+    : conns.length ? conns.map(c=>`
+    <div class="profile-conn-card">
+      <div class="profile-conn-avatar" style="background-image:url('${c.avatar}')"></div>
+      <div class="profile-conn-info"><strong>${escapeHtml(c.name)}</strong><span>${escapeHtml(c.school)}</span></div>
+      <button class="profile-conn-btn" data-user-id="${escapeHtml(c.id)}">${c.connectionStatus==='connected'?'✓ Connecté':'+ Connecter'}</button>
+    </div>`).join('') : `<div class="profile-empty">Aucune connexion pour l'instant</div>`;
+  return `
+    <div class="profile-top">
+      <button class="profile-back-btn" id="closeProfileBtn">‹</button>
+      <span class="profile-username-top">${escapeHtml(person.username)}</span>
+      <div style="width:38px"></div>
+    </div>
+    <div class="profile-hero">
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar-img" style="background-image:url('${person.avatar}')"></div>
+        <div class="profile-online-dot"></div>
+      </div>
+      <div class="profile-display-name">${escapeHtml(person.name)}</div>
+      <div class="profile-handle">${escapeHtml(person.username)}</div>
+      <div class="profile-school-tag">🎓 ${escapeHtml(person.school)}</div>
+      <p class="profile-bio">${escapeHtml(person.bio)}</p>
+      <div class="profile-cta-row">
+        <button class="profile-connect-btn ${connectClass}" id="profileConnectBtn" data-user-id="${escapeHtml(person.id)}">${connectLabel}</button>
+        <button class="profile-msg-btn" title="Message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="profile-stats-row">
+      <div class="profile-stat"><strong>${person.stats.connections}</strong><span>Connexions</span></div>
+      <div class="profile-stat"><strong>${person.stats.events}</strong><span>Événements</span></div>
+      <div class="profile-stat"><strong>${person.stats.badges}</strong><span>Badges</span></div>
+    </div>
+    <div class="profile-badges-row">${badgesHtml}</div>
+    <div class="profile-tabs">
+      <button class="profile-tab active" data-profile-tab="posts">Posts</button>
+      <button class="profile-tab" data-profile-tab="events">Événements</button>
+      <button class="profile-tab" data-profile-tab="connections">Connexions</button>
+    </div>
+    <div class="profile-panel active" id="profilePanelPosts">${postsHtml}</div>
+    <div class="profile-panel" id="profilePanelEvents">${eventsHtml}</div>
+    <div class="profile-panel" id="profilePanelConnections">${connsHtml}</div>
+  `;
+}
+function openProfile(userId){
+  const person=findPersonById(userId); if(!person) return;
+  const overlay=$('#profileOverlay');
+  overlay.innerHTML=renderProfile(person);
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden','false');
+  overlay.scrollTop=0;
+  document.body.style.overflow='hidden';
+}
+function closeProfile(){
+  const overlay=$('#profileOverlay');
+  overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+  setTimeout(()=>overlay.innerHTML='',280);
+}
+function setProfileTab(tab){
+  $all('.profile-tab').forEach(b=>b.classList.toggle('active',b.dataset.profileTab===tab));
+  $all('.profile-panel').forEach(p=>p.classList.remove('active'));
+  const panel=$(`#profilePanel${tab.charAt(0).toUpperCase()+tab.slice(1)}`);
+  if(panel) panel.classList.add('active');
+}
+function handleConnect(userId){
+  const person=findPersonById(userId); if(!person) return;
+  if(person.connectionStatus==='none'){
+    person.connectionStatus='pending';
+    showToast('Demande de connexion envoyée');
+  } else if(person.connectionStatus==='pending'){
+    person.connectionStatus='none';
+    showToast('Demande annulée');
+  } else {
+    person.connectionStatus='none';
+    showToast('Connexion supprimée');
+  }
+  openProfile(userId);
+}
 function bindEvents(){
   $('#openMenuBtn').addEventListener('click',openDrawer); $('#closeMenuBtn').addEventListener('click',closeDrawer); $('#drawerBackdrop').addEventListener('click',closeDrawer); $('#logoutBtn').addEventListener('click',logout);
   $all('.feed-tab').forEach(btn=>btn.addEventListener('click',()=>setActiveFeed(btn.dataset.feed)));
   document.addEventListener('click',(e)=>{
     const closeBtn=e.target.closest('#closeDetailBtn'); if(closeBtn){closeDetail();return}
+    const closeProfileBtn=e.target.closest('#closeProfileBtn'); if(closeProfileBtn){closeProfile();return}
+    const profileTab=e.target.closest('[data-profile-tab]'); if(profileTab){setProfileTab(profileTab.dataset.profileTab);return}
+    const connectBtn=e.target.closest('#profileConnectBtn,[data-user-id].profile-conn-btn'); if(connectBtn&&connectBtn.dataset.userId){handleConnect(connectBtn.dataset.userId);return}
+    const personCard=e.target.closest('[data-user-id].person-card'); if(personCard){openProfile(personCard.dataset.userId);return}
     const tab=e.target.closest('[data-detail-tab]'); if(tab){setDetailTab(tab.dataset.detailTab);return}
     const eventAction=e.target.closest('[data-event-action]'); if(eventAction){handleEventAction(eventAction.dataset.eventAction,eventAction.dataset.eventId);return}
     const pfBtn=e.target.closest('[data-pf]'); if(pfBtn&&pfBtn.classList.contains('pf-btn')){const filter=pfBtn.dataset.pf;document.querySelectorAll('.pf-btn').forEach(b=>b.classList.toggle('active',b.dataset.pf===filter));document.querySelectorAll('[data-pf-group]').forEach(g=>g.style.display=g.dataset.pfGroup===filter?'':'none');return}

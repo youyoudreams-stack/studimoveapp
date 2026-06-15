@@ -477,6 +477,60 @@ require_once __DIR__ . '/auth_config.php';
     .detail-meta-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0}.detail-meta-card{background:#f8fbff;border:1px solid #e8eef8;border-radius:20px;padding:13px}.detail-meta-card span{display:block;font-size:11px;color:#98A2B3;text-transform:uppercase;letter-spacing:.06em;font-weight:950;margin-bottom:5px}.detail-meta-card strong{display:block;color:#101828;font-size:13px;line-height:1.25;font-weight:950}
     .detail-event-box.premium{background:#f8fbff}.event-cta-row.premium{position:sticky;bottom:10px;z-index:5;background:rgba(255,255,255,.82);backdrop-filter:blur(14px);padding:10px;border:1px solid #edf2f7;border-radius:24px;box-shadow:0 16px 34px rgba(16,24,40,.12)}
     .detail-gallery-title{font-size:14px;font-weight:950;color:#101828;margin:16px 0 8px}.detail-gallery-grid.premium{padding:0;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.detail-gallery-img.premium{border:0;height:145px;border-radius:20px;box-shadow:inset 0 -30px 50px rgba(0,0,0,.1);cursor:pointer}
+
+    /* ── Profile overlay ── */
+    .profile-overlay{position:fixed;inset:0;z-index:200;background:#f4f8ff;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;overflow-x:hidden}
+    .profile-overlay.open{transform:translateX(0)}
+    .profile-top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0;position:sticky;top:0;background:#f4f8ff;z-index:10}
+    .profile-back-btn{width:38px;height:38px;border-radius:50%;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;color:#344054;box-shadow:var(--shadow);flex-shrink:0}
+    .profile-username-top{font-size:15px;font-weight:950;color:#101828;letter-spacing:-.3px}
+    .profile-hero{padding:20px 20px 0;display:flex;flex-direction:column;align-items:center;text-align:center}
+    .profile-avatar-wrap{position:relative;margin-bottom:14px}
+    .profile-avatar-img{width:88px;height:88px;border-radius:50%;background-size:cover;background-position:center;border:3px solid #fff;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+    .profile-online-dot{position:absolute;bottom:4px;right:4px;width:16px;height:16px;background:#22c55e;border-radius:50%;border:2.5px solid #fff}
+    .profile-display-name{font-size:22px;font-weight:950;color:#101828;letter-spacing:-.5px;margin-bottom:2px}
+    .profile-handle{font-size:14px;font-weight:700;color:#667085;margin-bottom:6px}
+    .profile-school-tag{display:inline-flex;align-items:center;gap:5px;background:#e0f0ff;color:var(--blue);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:850;margin-bottom:12px}
+    .profile-bio{font-size:14px;color:#344054;line-height:1.6;max-width:320px;margin:0 auto 16px}
+    .profile-cta-row{display:flex;gap:10px;margin-bottom:20px;width:100%;max-width:340px}
+    .profile-connect-btn{flex:1;border:0;border-radius:14px;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#fff;padding:12px 16px;font-size:14px;font-weight:850;font-family:inherit;cursor:pointer;box-shadow:0 6px 18px rgba(11,108,255,.28);transition:filter .18s,transform .18s}
+    .profile-connect-btn:hover{filter:brightness(1.06);transform:translateY(-1px)}
+    .profile-connect-btn.pending{background:#f4f8ff;color:var(--blue);border:1.5px solid var(--blue);box-shadow:none}
+    .profile-connect-btn.connected{background:#e9fbf0;color:#067647;border:1.5px solid #bbf7d0;box-shadow:none}
+    .profile-msg-btn{width:46px;height:46px;border-radius:14px;border:1.5px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#344054;flex-shrink:0;box-shadow:var(--shadow)}
+    .profile-stats-row{display:flex;gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#fff;width:100%}
+    .profile-stat{flex:1;padding:14px 8px;text-align:center;border-right:1px solid var(--line)}
+    .profile-stat:last-child{border-right:0}
+    .profile-stat strong{display:block;font-size:20px;font-weight:950;color:#101828;letter-spacing:-.5px}
+    .profile-stat span{display:block;font-size:11px;font-weight:750;color:#98A2B3;margin-top:2px}
+    .profile-badges-row{display:flex;gap:8px;padding:16px 20px;overflow-x:auto;scrollbar-width:none}
+    .profile-badges-row::-webkit-scrollbar{display:none}
+    .profile-badge-chip{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:850;color:#344054;white-space:nowrap;box-shadow:var(--shadow)}
+    .profile-tabs{display:flex;border-bottom:2px solid var(--line);background:#fff;position:sticky;top:52px;z-index:9}
+    .profile-tab{flex:1;padding:13px 4px;text-align:center;font-size:13px;font-weight:850;color:#98A2B3;background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .18s,border-color .18s}
+    .profile-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+    .profile-panel{display:none;padding:16px 16px 80px}
+    .profile-panel.active{display:block}
+    .profile-post-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+    .profile-post-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .profile-post-avatar{width:36px;height:36px;border-radius:50%;background-size:cover;background-position:center;flex-shrink:0}
+    .profile-post-meta strong{display:block;font-size:13px;font-weight:950;color:#101828}
+    .profile-post-meta span{display:block;font-size:11px;color:#98A2B3;font-weight:700}
+    .profile-post-text{font-size:14px;color:#344054;line-height:1.6}
+    .profile-post-privacy{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:850;color:#98A2B3;margin-top:8px}
+    .profile-post-img{width:100%;border-radius:14px;margin-top:10px;object-fit:cover;max-height:200px}
+    .profile-event-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
+    .profile-event-img{width:54px;height:54px;border-radius:14px;background-size:cover;background-position:center;flex-shrink:0}
+    .profile-event-info strong{display:block;font-size:14px;font-weight:950;color:#101828}
+    .profile-event-info span{display:block;font-size:12px;color:#667085;font-weight:700;margin-top:2px}
+    .profile-event-badge{display:inline-block;font-size:11px;font-weight:850;padding:3px 9px;border-radius:999px;margin-top:4px;background:#e0f0ff;color:var(--blue)}
+    .profile-conn-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
+    .profile-conn-avatar{width:46px;height:46px;border-radius:50%;background-size:cover;background-position:center;flex-shrink:0}
+    .profile-conn-info strong{display:block;font-size:14px;font-weight:950;color:#101828}
+    .profile-conn-info span{display:block;font-size:12px;color:#98A2B3;font-weight:700}
+    .profile-conn-btn{margin-left:auto;border:1.5px solid var(--line);border-radius:12px;padding:7px 14px;font-size:12px;font-weight:850;color:#344054;background:#fff;cursor:pointer;white-space:nowrap}
+    .profile-privacy-lock{display:inline-flex;align-items:center;gap:5px;background:#f4f8ff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:13px;font-weight:750;color:#667085;width:100%;margin-bottom:12px}
+    .profile-empty{text-align:center;color:#98A2B3;font-size:14px;font-weight:700;padding:32px 0}
     .detail-video-box iframe{width:100%;height:260px;border:0;border-radius:22px;background:#000;box-shadow:0 14px 34px rgba(16,24,40,.14)}.detail-whatsapp{display:flex;justify-content:center;align-items:center;margin-top:14px;padding:13px 16px;border-radius:999px;background:#e9fbf0;color:#067647;text-decoration:none;font-weight:950;border:1px solid #bbf7d0}
     @media(min-width:900px){.detail-meta-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.detail-gallery-grid.premium{grid-template-columns:repeat(4,minmax(0,1fr))}.detail-gallery-img.premium{height:150px}.detail-video-box iframe{height:360px}}
 
@@ -555,7 +609,8 @@ require_once __DIR__ . '/auth_config.php';
     <div class="drawer-footer"><button class="drawer-link logout-link" id="logoutBtn" type="button"><span class="menu-ico">↩</span>Se déconnecter</button></div>
   </aside>
   <section class="detail-overlay" id="detailOverlay" aria-hidden="true"></section>
+  <div class="profile-overlay" id="profileOverlay" aria-hidden="true"></div>
   <div class="toast" id="toast"></div>
-  <script src="app.js?v=auth-pages-v3"></script>
+  <script src="app.js?v=profile-overlay-v1"></script>
 </body>
 </html>
