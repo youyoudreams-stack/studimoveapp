@@ -556,6 +556,6 @@ require_once __DIR__ . '/auth_config.php';
   </aside>
   <section class="detail-overlay" id="detailOverlay" aria-hidden="true"></section>
   <div class="toast" id="toast"></div>
-  <script src="app.js?v=fix-slider-v1"></script>
+  <script src="app.js?v=fix-slider-v2"></script>
 </body>
 </html>
