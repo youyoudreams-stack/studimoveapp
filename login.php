@@ -9,52 +9,119 @@ require_once __DIR__ . '/auth_config.php';
   <title>Connexion — StudiMove</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    :root{--blue:#0B6CFF;--cyan:#00D4FF;--yellow:#FFD000;--line:#e9eef7;--soft:#f4f8ff;--text:#111111;--muted:#667085}
-    *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--text)}
-    body{overflow-x:hidden;background:#f4f8ff}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
 
-    .auth-shell{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden}
-    .auth-shell:before{content:"";position:absolute;top:-120px;left:-120px;width:420px;height:420px;background:radial-gradient(circle,rgba(11,108,255,.13) 0%,transparent 70%);border-radius:50%;pointer-events:none}
-    .auth-shell:after{content:"";position:absolute;bottom:-80px;right:-80px;width:320px;height:320px;background:radial-gradient(circle,rgba(0,212,255,.10) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+    .auth-shell{
+      min-height:100vh;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:24px;
+      position:relative;overflow:hidden;
+      background:url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920&q=80') center/cover no-repeat;
+    }
+    .auth-shell:before{
+      content:"";position:absolute;inset:0;
+      background:linear-gradient(160deg,rgba(5,10,30,.72) 0%,rgba(11,30,80,.60) 50%,rgba(0,0,0,.75) 100%);
+      z-index:0;
+    }
 
-    .auth-card{width:100%;max-width:440px;background:#fff;border:1px solid var(--line);border-radius:32px;padding:36px 32px 32px;box-shadow:0 24px 64px rgba(11,108,255,.10),0 4px 16px rgba(0,0,0,.06);position:relative;z-index:1}
+    .auth-brand{
+      position:relative;z-index:1;
+      text-align:center;margin-bottom:28px;
+    }
+    .auth-brand-name{
+      font-size:42px;font-weight:950;letter-spacing:-1.5px;line-height:1;
+    }
+    .brand-studi{color:#fff}
+    .brand-move{color:#FFD000}
+    .auth-brand-tagline{
+      font-size:13px;color:rgba(255,255,255,.55);font-weight:500;
+      margin-top:6px;letter-spacing:.3px;
+    }
 
-    .brand{display:flex;align-items:center;gap:10px;margin-bottom:28px}
-    .brand-logo{width:44px;height:44px;border-radius:16px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(11,108,255,.28)}
-    .brand-logo svg{width:24px;height:24px;fill:#fff}
-    .brand-name{font-size:22px;font-weight:950;letter-spacing:-.6px}
-    .brand-studi{color:var(--blue)}.brand-move{color:var(--yellow)}
+    .auth-card{
+      width:100%;max-width:400px;
+      background:rgba(255,255,255,.10);
+      backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:28px;
+      padding:32px 28px 28px;
+      position:relative;z-index:1;
+      box-shadow:0 32px 64px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.15);
+    }
 
-    .auth-title{font-size:26px;font-weight:950;letter-spacing:-.6px;margin:0 0 6px;color:#101828}
-    .auth-sub{font-size:14px;color:var(--muted);font-weight:650;margin:0 0 28px;line-height:1.5}
+    .auth-title{font-size:22px;font-weight:850;color:#fff;letter-spacing:-.4px;margin-bottom:4px}
+    .auth-sub{font-size:13px;color:rgba(255,255,255,.55);font-weight:500;margin-bottom:24px;line-height:1.5}
 
-    .field{margin-bottom:16px}
-    .field label{display:block;font-size:13px;font-weight:850;color:#344054;margin-bottom:7px}
-    .field input{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:13px 16px;font-size:15px;font-family:inherit;outline:none;background:#fff;color:var(--text);transition:border-color .18s ease,box-shadow .18s ease}
-    .field input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,108,255,.10)}
-    .field input::placeholder{color:#98A2B3}
+    .field{margin-bottom:14px}
+    .field label{display:block;font-size:12px;font-weight:750;color:rgba(255,255,255,.7);margin-bottom:6px;letter-spacing:.2px}
+    .field input{
+      width:100%;
+      background:rgba(255,255,255,.10);
+      border:1.5px solid rgba(255,255,255,.18);
+      border-radius:14px;
+      padding:13px 16px;
+      font-size:15px;font-family:inherit;
+      color:#fff;
+      outline:none;
+      transition:border-color .18s,box-shadow .18s,background .18s;
+    }
+    .field input::placeholder{color:rgba(255,255,255,.35)}
+    .field input:focus{
+      border-color:rgba(255,255,255,.5);
+      background:rgba(255,255,255,.16);
+      box-shadow:0 0 0 4px rgba(255,255,255,.08);
+    }
 
-    .submit-btn{width:100%;border:0;border-radius:16px;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#fff;padding:15px 16px;font-weight:950;font-size:15px;font-family:inherit;margin-top:8px;cursor:pointer;box-shadow:0 8px 24px rgba(11,108,255,.28);transition:filter .18s ease,transform .18s ease;letter-spacing:-.1px}
-    .submit-btn:hover{filter:brightness(1.06);transform:translateY(-1px)}
+    .submit-btn{
+      width:100%;border:0;border-radius:14px;
+      background:linear-gradient(90deg,#0B6CFF,#00D4FF);
+      color:#fff;padding:14px 16px;
+      font-weight:850;font-size:15px;font-family:inherit;
+      margin-top:6px;cursor:pointer;
+      box-shadow:0 8px 24px rgba(11,108,255,.40);
+      transition:filter .18s,transform .18s;
+      letter-spacing:-.1px;
+    }
+    .submit-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
     .submit-btn:active{transform:translateY(0)}
+    .submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
 
-    .error-box{display:none;margin-top:14px;background:#fff1f2;border:1px solid #fecdd3;color:#be123c;border-radius:14px;padding:12px 16px;font-size:13px;font-weight:750;line-height:1.4}
+    .error-box{
+      display:none;margin-top:12px;
+      background:rgba(190,18,60,.2);
+      border:1px solid rgba(254,205,211,.3);
+      color:#fda4af;
+      border-radius:12px;padding:11px 14px;
+      font-size:13px;font-weight:700;line-height:1.4;
+    }
 
-    .auth-links{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
-    .auth-link{color:var(--blue);font-weight:850;text-decoration:none;font-size:13px;transition:opacity .15s ease}
-    .auth-link:hover{opacity:.75}
+    .auth-links{
+      display:flex;justify-content:space-between;align-items:center;
+      gap:10px;margin-top:20px;padding-top:18px;
+      border-top:1px solid rgba(255,255,255,.1);
+    }
+    .auth-link{
+      color:rgba(255,255,255,.7);font-weight:750;text-decoration:none;
+      font-size:13px;transition:color .15s;
+    }
+    .auth-link:hover{color:#fff}
 
-    @media(max-width:480px){.auth-card{padding:28px 22px 24px;border-radius:28px}}
+    @media(max-width:480px){
+      .auth-card{padding:24px 20px 22px;border-radius:24px}
+      .auth-brand-name{font-size:36px}
+    }
   </style>
 </head>
 <body>
 <div class="auth-shell">
-  <main class="auth-card">
-    <div class="brand">
-      <div class="brand-name"><span class="brand-studi">Studi</span><span class="brand-move">move</span></div>
-    </div>
 
+  <div class="auth-brand">
+    <div class="auth-brand-name"><span class="brand-studi">Studi</span><span class="brand-move">move</span></div>
+    <div class="auth-brand-tagline">Découvre. Sors. Vis.</div>
+  </div>
+
+  <main class="auth-card">
     <h1 class="auth-title">Bon retour 👋</h1>
     <p class="auth-sub">Connecte-toi pour accéder à tes aventures étudiantes.</p>
 
@@ -76,6 +143,7 @@ require_once __DIR__ . '/auth_config.php';
       <a class="auth-link" href="forgot-password.php">Mot de passe oublié ?</a>
     </div>
   </main>
+
 </div>
 
 <script>
