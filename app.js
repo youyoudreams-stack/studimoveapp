@@ -570,9 +570,12 @@ function renderFeed(){
     </article>`}).join('')
 }
 function setActiveFeed(feed){state.activeFeed=feed;$all('.feed-tab').forEach(btn=>btn.classList.toggle('active',btn.dataset.feed===feed));track('feed_tab_change',{feed_tab:feed});renderFeed()}
-function renderPeopleList(kind){
-  const label = kind === 'going' ? 'Inscrit' : kind === 'interested' ? 'Intéressé' : null;
-  return `<div class="people-list">${people.map(p=>`<div class="person-row"><div class="person-avatar" style="background-image:url('${p.avatar}')"></div><div class="person-main"><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.school)}</span></div>${label?`<span class="person-badge">${label}</span>`:''}</div>`).join('')}</div>`;
+function renderPeopleGrid(list, kind){
+  if(!list.length) return `<p style="text-align:center;color:#98A2B3;font-size:13px;font-weight:700;padding:20px 0">Aucun participant pour l'instant</p>`;
+  return `<div class="people-grid">${list.map(p=>{
+    const badge = kind==='going' ? `<span class="person-card-badge going">Inscrit ✓</span>` : kind==='interested' ? `<span class="person-card-badge interested">Intéressé</span>` : '';
+    return `<div class="person-card"><div class="person-card-avatar" style="background-image:url('${p.avatar}')"></div><div class="person-card-name">${escapeHtml(p.name)}</div><div class="person-card-school">${escapeHtml(p.school)}</div>${badge}</div>`;
+  }).join('')}</div>`;
 }
 function renderComments(){
   return `<div class="comments-list">${comments.map(c=>`<div class="comment-row"><div class="comment-avatar" style="background-image:url('${c.avatar}')"></div><div class="comment-main"><strong>${escapeHtml(c.name)} · <span style="display:inline;color:#98A2B3">${escapeHtml(c.time)}</span></strong><span class="comment-text">${escapeHtml(c.text)}</span></div></div>`).join('')}</div><div class="comment-box"><input class="comment-input" placeholder="Écrire un commentaire..." /><button class="comment-send" data-comment-send="1">Envoyer</button></div>`;
@@ -656,18 +659,26 @@ function renderDetailPanels(item){
     </div>
   </div>`;
 
+  const interestedPeople = people.filter((_,i)=>i<3);
+  const goingPeople = people.filter((_,i)=>i>=2);
+  const allPeople = people;
   const participantsPanel = isEvent ? `<div class="detail-panel" data-panel="participants">
     <div class="detail-section-card">
       <h3>Participants</h3>
+      <div class="participants-counts">
+        <div class="pc-stat"><strong>${allPeople.length}</strong><span>Total</span></div>
+        <div class="pc-stat"><strong>${interestedPeople.length}</strong><span>Intéressés</span></div>
+        <div class="pc-stat"><strong>${goingPeople.length}</strong><span>Inscrits</span></div>
+      </div>
       <div class="participants-filter">
-        <button class="pf-btn active" data-pf="all">Tous</button>
-        <button class="pf-btn" data-pf="interested">Intéressés</button>
-        <button class="pf-btn" data-pf="going">Inscrits</button>
+        <button class="pf-btn active" data-pf="all">Tous (${allPeople.length})</button>
+        <button class="pf-btn" data-pf="interested">Intéressés (${interestedPeople.length})</button>
+        <button class="pf-btn" data-pf="going">Inscrits (${goingPeople.length})</button>
       </div>
       <div id="participantsList">
-        <div data-pf-group="all">${renderPeopleList('all')}</div>
-        <div data-pf-group="interested" style="display:none">${renderPeopleList('interested')}</div>
-        <div data-pf-group="going" style="display:none">${renderPeopleList('going')}</div>
+        <div data-pf-group="all">${renderPeopleGrid(allPeople,'all')}</div>
+        <div data-pf-group="interested" style="display:none">${renderPeopleGrid(interestedPeople,'interested')}</div>
+        <div data-pf-group="going" style="display:none">${renderPeopleGrid(goingPeople,'going')}</div>
       </div>
     </div>
   </div>` : '';
