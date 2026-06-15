@@ -63,7 +63,7 @@ require_once __DIR__ . '/auth_config.php';
 <div class="app-shell">
   <main class="app-main">
     <div class="topbar">
-      <a class="back-btn" href="profile.php" aria-label="Retour">←</a>
+      <button class="back-btn" onclick="history.back()" aria-label="Retour">←</button>
       <h1 class="page-heading">Aide & support</h1>
       <button class="hamburger-btn" id="openMenuBtn" type="button" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>

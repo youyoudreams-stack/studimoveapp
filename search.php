@@ -56,7 +56,7 @@ require_once __DIR__ . '/auth_config.php';
 <div class="app-shell">
   <main class="app-main">
     <div class="topbar">
-      <a class="back-btn" href="index.php" aria-label="Retour">←</a>
+      <button class="back-btn" onclick="history.back()" aria-label="Retour">←</button>
       <div class="search-bar" style="flex:1">
         <span class="search-icon">⌕</span>
         <input class="search-input" id="searchInput" type="search" placeholder="Rechercher un événement…" autocomplete="off" autofocus>
