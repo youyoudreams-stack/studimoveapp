@@ -17,60 +17,60 @@ require_once __DIR__ . '/auth_config.php';
       display:flex;flex-direction:column;align-items:center;justify-content:center;
       padding:24px;
       position:relative;overflow:hidden;
-      background:url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1920&q=80') center/cover no-repeat;
+      background:url('https://images.unsplash.com/photo-1539635278303-d4002c07eae3?w=1920&q=80') center/cover no-repeat;
     }
     .auth-shell:before{
       content:"";position:absolute;inset:0;
-      background:linear-gradient(160deg,rgba(5,10,30,.72) 0%,rgba(11,30,80,.60) 50%,rgba(0,0,0,.75) 100%);
+      background:linear-gradient(170deg,rgba(5,10,30,.55) 0%,rgba(11,30,80,.45) 40%,rgba(0,0,0,.60) 100%);
       z-index:0;
     }
 
     .auth-brand{
       position:relative;z-index:1;
-      text-align:center;margin-bottom:28px;
+      text-align:center;margin-bottom:24px;
     }
     .auth-brand-name{
-      font-size:42px;font-weight:950;letter-spacing:-1.5px;line-height:1;
+      font-size:44px;font-weight:950;letter-spacing:-1.5px;line-height:1;
+      text-shadow:0 2px 20px rgba(0,0,0,.3);
     }
     .brand-studi{color:#fff}
     .brand-move{color:#FFD000}
     .auth-brand-tagline{
-      font-size:13px;color:rgba(255,255,255,.55);font-weight:500;
-      margin-top:6px;letter-spacing:.3px;
+      font-size:14px;color:rgba(255,255,255,.85);font-weight:600;
+      margin-top:8px;letter-spacing:.2px;
+      text-shadow:0 1px 8px rgba(0,0,0,.4);
     }
 
     .auth-card{
       width:100%;max-width:400px;
-      background:rgba(255,255,255,.10);
-      backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-      border:1px solid rgba(255,255,255,.18);
+      background:#fff;
       border-radius:28px;
       padding:32px 28px 28px;
       position:relative;z-index:1;
-      box-shadow:0 32px 64px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.15);
+      box-shadow:0 32px 80px rgba(0,0,0,.30),0 8px 24px rgba(0,0,0,.12);
     }
 
-    .auth-title{font-size:22px;font-weight:850;color:#fff;letter-spacing:-.4px;margin-bottom:4px}
-    .auth-sub{font-size:13px;color:rgba(255,255,255,.55);font-weight:500;margin-bottom:24px;line-height:1.5}
+    .auth-title{font-size:22px;font-weight:850;color:#101828;letter-spacing:-.4px;margin-bottom:4px}
+    .auth-sub{font-size:13px;color:#667085;font-weight:500;margin-bottom:24px;line-height:1.5}
 
     .field{margin-bottom:14px}
-    .field label{display:block;font-size:12px;font-weight:750;color:rgba(255,255,255,.7);margin-bottom:6px;letter-spacing:.2px}
+    .field label{display:block;font-size:12px;font-weight:750;color:#344054;margin-bottom:6px;letter-spacing:.2px}
     .field input{
       width:100%;
-      background:rgba(255,255,255,.10);
-      border:1.5px solid rgba(255,255,255,.18);
+      background:#f9fafb;
+      border:1.5px solid #e9eef7;
       border-radius:14px;
       padding:13px 16px;
       font-size:15px;font-family:inherit;
-      color:#fff;
+      color:#111;
       outline:none;
       transition:border-color .18s,box-shadow .18s,background .18s;
     }
-    .field input::placeholder{color:rgba(255,255,255,.35)}
+    .field input::placeholder{color:#98A2B3}
     .field input:focus{
-      border-color:rgba(255,255,255,.5);
-      background:rgba(255,255,255,.16);
-      box-shadow:0 0 0 4px rgba(255,255,255,.08);
+      border-color:#0B6CFF;
+      background:#fff;
+      box-shadow:0 0 0 4px rgba(11,108,255,.10);
     }
 
     .submit-btn{
@@ -79,7 +79,7 @@ require_once __DIR__ . '/auth_config.php';
       color:#fff;padding:14px 16px;
       font-weight:850;font-size:15px;font-family:inherit;
       margin-top:6px;cursor:pointer;
-      box-shadow:0 8px 24px rgba(11,108,255,.40);
+      box-shadow:0 8px 24px rgba(11,108,255,.30);
       transition:filter .18s,transform .18s;
       letter-spacing:-.1px;
     }
@@ -89,9 +89,7 @@ require_once __DIR__ . '/auth_config.php';
 
     .error-box{
       display:none;margin-top:12px;
-      background:rgba(190,18,60,.2);
-      border:1px solid rgba(254,205,211,.3);
-      color:#fda4af;
+      background:#fff1f2;border:1px solid #fecdd3;color:#be123c;
       border-radius:12px;padding:11px 14px;
       font-size:13px;font-weight:700;line-height:1.4;
     }
@@ -99,17 +97,17 @@ require_once __DIR__ . '/auth_config.php';
     .auth-links{
       display:flex;justify-content:space-between;align-items:center;
       gap:10px;margin-top:20px;padding-top:18px;
-      border-top:1px solid rgba(255,255,255,.1);
+      border-top:1px solid #e9eef7;
     }
     .auth-link{
-      color:rgba(255,255,255,.7);font-weight:750;text-decoration:none;
-      font-size:13px;transition:color .15s;
+      color:#0B6CFF;font-weight:750;text-decoration:none;
+      font-size:13px;transition:opacity .15s;
     }
-    .auth-link:hover{color:#fff}
+    .auth-link:hover{opacity:.75}
 
     @media(max-width:480px){
       .auth-card{padding:24px 20px 22px;border-radius:24px}
-      .auth-brand-name{font-size:36px}
+      .auth-brand-name{font-size:38px}
     }
   </style>
 </head>
@@ -118,7 +116,7 @@ require_once __DIR__ . '/auth_config.php';
 
   <div class="auth-brand">
     <div class="auth-brand-name"><span class="brand-studi">Studi</span><span class="brand-move">move</span></div>
-    <div class="auth-brand-tagline">Découvre. Sors. Vis.</div>
+    <div class="auth-brand-tagline">Partagez, voyagez, vibrez !</div>
   </div>
 
   <main class="auth-card">
