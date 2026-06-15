@@ -59,13 +59,13 @@ require_once __DIR__ . '/auth_config.php';
     .feed-tab.active{background:linear-gradient(90deg,var(--blue),var(--cyan));color:#fff;border-color:transparent;box-shadow:0 8px 22px rgba(11,108,255,.20)}
     .feed-list{display:grid;grid-template-columns:1fr;gap:16px;margin-top:12px;width:100%}
     .post-card{background:#fff;border-radius:24px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);cursor:pointer}
-    .post-head{padding:14px 14px 11px;display:flex;align-items:center;justify-content:space-between;gap:12px}
     .post-author{display:flex;align-items:center;gap:10px;min-width:0}
     .entity-logo{width:42px;height:42px;border-radius:17px;background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:950;flex-shrink:0;box-shadow:0 8px 18px rgba(11,108,255,.18)}
     .author-name{font-size:14px;font-weight:950;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .post-meta{margin:2px 0 0;color:#667085;font-size:11px;font-weight:700}
     .more-btn{border:0;background:#f7faff;color:#98A2B3;border-radius:14px;width:34px;height:34px;cursor:pointer;font-weight:950}
     .post-media{height:245px;position:relative;overflow:hidden;background:#ddd}
+    .post-media-top{border-radius:0}
     .post-img{width:100%;height:100%;background-size:cover;background-position:center;display:block}
     .media-badge{position:absolute;right:13px;top:13px;background:rgba(0,0,0,.42);color:#fff;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:950;backdrop-filter:blur(10px)}
     .event-pill{position:absolute;left:13px;top:13px;background:#fff;color:#111827;border-radius:999px;padding:7px 11px;font-size:11px;font-weight:950;display:flex;align-items:center;gap:6px;box-shadow:0 10px 22px rgba(0,0,0,.12)}
@@ -115,7 +115,7 @@ require_once __DIR__ . '/auth_config.php';
     .detail-main-title{font-size:25px;line-height:1.08;letter-spacing:-.7px;margin:0 0 10px;font-weight:950;color:#111}
     .detail-text{font-size:15px;line-height:1.58;color:#344054;margin:0 0 16px;font-weight:600}
     .detail-event-box{margin:16px 0;padding:14px;background:#f7faff;border:1px solid var(--line);border-radius:22px}
-    .detail-event-box h3{margin:0 0 10px;font-size:16px;font-weight:950}.event-detail-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.event-detail-stat{background:#fff;border:1px solid #e8eef8;border-radius:18px;padding:12px}.event-detail-stat strong{display:block;font-size:20px}.event-detail-stat span{font-size:12px;color:#667085;font-weight:800}
+    .detail-event-box h3{margin:0 0 10px;font-size:16px;font-weight:950}.event-detail-stats{display:grid;grid-template-columns:1fr;gap:10px}.event-detail-stat{background:#fff;border:1px solid #e8eef8;border-radius:18px;padding:12px}.event-detail-stat strong{display:block;font-size:20px}.event-detail-stat span{font-size:12px;color:#667085;font-weight:800}
     .event-cta-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
     .event-cta{border:0;border-radius:18px;padding:13px 12px;font-weight:950;cursor:pointer}
     .event-cta.interest{background:#f4f8ff;color:#0B6CFF;border:1px solid #dbeafe}
@@ -451,7 +451,7 @@ require_once __DIR__ . '/auth_config.php';
     .detail-hero.premium:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.14))}
     .detail-author-card{margin:-22px auto 0;position:relative;z-index:2;width:calc(100% - 46px);max-width:620px;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border:1px solid rgba(234,240,248,.95);border-radius:24px;padding:12px 14px;display:flex;align-items:center;justify-content:center;gap:12px;box-shadow:0 18px 38px rgba(16,24,40,.12)}
     .detail-org-logo{width:48px;height:48px;flex:0 0 48px}.detail-author-copy{display:flex;flex-direction:column;align-items:flex-start}.detail-author-copy span{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:#98A2B3}.detail-author-copy strong{font-size:16px;font-weight:950;color:#101828}.detail-author-copy small{font-size:12px;font-weight:750;color:#667085;margin-top:2px}
-    .detail-tabs.premium{position:sticky;top:58px;justify-content:center;background:rgba(247,250,255,.92);border-bottom:0;padding:16px 12px 8px;margin-top:8px}
+    .detail-tabs.premium{position:sticky;top:58px;justify-content:center;background:rgba(247,250,255,.92);border-bottom:0;padding:16px 12px 8px;margin-top:20px}
     .detail-tabs.premium .detail-tab{background:#fff;box-shadow:0 4px 14px rgba(16,24,40,.06);border-color:#eef2f7;color:#475467}
     .detail-tabs.premium .detail-tab.active{background:linear-gradient(90deg,var(--blue),var(--cyan)) !important;color:#fff !important;border-color:transparent !important;box-shadow:0 8px 22px rgba(11,108,255,.28) !important}
     .participants-counts{display:flex;gap:10px;margin-bottom:18px}
@@ -554,13 +554,12 @@ require_once __DIR__ . '/auth_config.php';
     /* Desktop grid */
     @media(min-width:640px){
       .event-media-mobile{display:none}
-      .event-media-desktop{display:grid;grid-template-columns:1fr 1fr;gap:6px;border-radius:20px;overflow:hidden;height:320px}
-      .event-media-main{background-size:cover;background-position:center;cursor:pointer;height:100%;grid-row:span 2}
-      .event-media-aside{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:6px;position:relative}
-      .event-media-aside-img,.gallery-item-video{background-size:cover;background-position:center;cursor:pointer;border-radius:0}
+      .event-media-desktop{display:grid;grid-template-columns:1fr 1fr;gap:6px;border-radius:24px;overflow:hidden;height:340px;position:relative;width:100%}
+      .event-media-single{grid-template-columns:1fr}
+      .event-media-main,.event-media-second{background-size:cover;background-position:center;cursor:pointer;height:100%}
     }
     @media(min-width:860px){
-      .event-media-desktop{grid-template-columns:3fr 2fr;height:380px}
+      .event-media-desktop{height:420px}
     }
 
     /* ── Gallery in hero area ── */
@@ -568,12 +567,12 @@ require_once __DIR__ . '/auth_config.php';
     .detail-hero-gallery .event-media-block{margin:0}
     .detail-hero-gallery .event-media-mobile{border-radius:28px}
     .detail-hero-gallery .event-media-slider{border-radius:28px}
-    .detail-hero-gallery .event-media-slide,.detail-hero-gallery .gallery-item-video{height:clamp(260px,54vw,520px);border-radius:0}
+    .detail-hero-gallery .event-media-slide,.detail-hero-gallery .gallery-item-video{height:clamp(260px,54vw,460px);border-radius:0}
     @media(min-width:640px){
-      .detail-hero-gallery .event-media-desktop{height:clamp(300px,40vw,520px);border-radius:28px}
+      .detail-hero-gallery .event-media-desktop{height:clamp(300px,38vw,500px);border-radius:28px}
     }
     @media(min-width:860px){
-      .detail-hero-gallery .event-media-desktop{height:clamp(360px,38vw,520px)}
+      .detail-hero-gallery .event-media-desktop{height:clamp(380px,36vw,520px)}
     }
 
     /* ── Gallery Modal ── */
@@ -681,6 +680,6 @@ require_once __DIR__ . '/auth_config.php';
     <div class="gallery-dots"></div>
   </div>
   <div class="toast" id="toast"></div>
-  <script src="app.js?v=gallery-hero-v2"></script>
+  <script src="app.js?v=gallery-hero-v3"></script>
 </body>
 </html>

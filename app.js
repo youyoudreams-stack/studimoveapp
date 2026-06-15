@@ -578,8 +578,7 @@ function renderFeed(){
   feedList.innerHTML=items.map(item=>{
     const isFav=state.favoriteIds.has(item.id);
     return `<article class="post-card" data-open-id="${escapeHtml(item.id)}">
-      <div class="post-head"><div class="post-author"><div class="entity-logo">${escapeHtml(item.initials)}</div><div><p class="author-name">${escapeHtml(item.entity)}</p><p class="post-meta">${escapeHtml(item.meta)}</p></div></div><button class="more-btn" type="button" data-toast="Options bientôt disponibles">•••</button></div>
-      <div class="post-media"><div class="post-img" data-lazybg="${escapeHtml(item.image)}"></div><span class="${item.type==='event'?'event-pill':'media-badge'}">${item.type==='event'?'◷ ':''}${escapeHtml(item.badge)}</span><button class="favorite-btn ${isFav?'active':''}" type="button" data-fav="${escapeHtml(item.id)}" aria-label="Ajouter aux favoris">${favoriteIcon(isFav)}</button></div>
+      <div class="post-media post-media-top"><div class="post-img" data-lazybg="${escapeHtml(item.image)}"></div><span class="${item.type==='event'?'event-pill':'media-badge'}">${item.type==='event'?'◷ ':''}${escapeHtml(item.badge)}</span><button class="favorite-btn ${isFav?'active':''}" type="button" data-fav="${escapeHtml(item.id)}" aria-label="Ajouter aux favoris">${favoriteIcon(isFav)}</button></div>
       <div class="post-body"><h3 class="post-title">${escapeHtml(item.title)}</h3><p class="post-text">${escapeHtml(item.text)}</p>${renderEventSocialProof(item)}<div class="post-actions"><span class="action">♥ ${item.likes}</span><span class="action">💬 ${item.comments}</span><span class="action-spacer"></span><span class="action">➤</span></div></div>
     </article>`}).join('')
   requestAnimationFrame(initLazyBg);
@@ -654,9 +653,10 @@ function renderEventMediaBlock(item){
   const mobileSlides=media.map((m,i)=>thumbOf(m,'event-media-slide',i)).join('');
   const mobileHtml=`<div class="event-media-mobile"><div class="event-media-slider">${mobileSlides}</div>${galBtn}</div>`;
 
-  // Desktop: hero + grid
-  const aside=media.slice(1,5).map((m,i)=>thumbOf(m,'event-media-aside-img',i+1)).join('');
-  const desktopHtml=`<div class="event-media-desktop">${thumbOf(media[0],'event-media-main',0)}<div class="event-media-aside">${aside}${media.length>1?galBtn:''}</div></div>`;
+  // Desktop: 2 images side by side
+  const desktopHtml=media.length>1
+    ?`<div class="event-media-desktop">${thumbOf(media[0],'event-media-main',0)}${thumbOf(media[1],'event-media-second',1)}${galBtn}</div>`
+    :`<div class="event-media-desktop event-media-single">${thumbOf(media[0],'event-media-main',0)}${galBtn}</div>`;
 
   return `<div class="event-media-block">${desktopHtml}${mobileHtml}</div>`;
 }
@@ -735,7 +735,8 @@ function renderEventBox(item){
       <button class="event-cta join" data-event-action="join" data-event-id="${escapeHtml(item.id)}">Je participe</button>`;
   }
 
-  return `<div class="detail-event-box premium"><h3>Statut de l'événement</h3><div class="event-detail-stats"><div class="event-detail-stat"><strong>${item.interested||0}</strong><span>intéressés</span></div><div class="event-detail-stat"><strong>${item.going||0}</strong><span>inscrits</span></div></div>${renderEventSocialProof(item)}</div><div class="event-cta-row premium">${ctaHtml}</div>`;
+  const totalParticipants=(item.interested||0)+(item.going||0);
+  return `<div class="detail-event-box premium"><h3>Statut de l'événement</h3><div class="event-detail-stats"><div class="event-detail-stat"><strong>${totalParticipants}</strong><span>Participants</span></div></div>${renderEventSocialProof(item)}</div><div class="event-cta-row premium">${ctaHtml}</div>`;
 }
 function renderDetailPanels(item){
   const isEvent=item.type==='event';
@@ -827,11 +828,6 @@ function renderDetail(item){
       ?`<div class="detail-hero-card detail-hero-gallery">${renderEventMediaBlock(item)}</div>`
       :`<div class="detail-hero-card"><div class="detail-hero premium" style="background-image:url('${hero}')"></div></div>`
     }
-
-    <div class="detail-author-card">
-      <div class="entity-logo detail-org-logo">${escapeHtml(organizerLogo)}</div>
-      <div class="detail-author-copy"><span>Par</span><strong>${escapeHtml(organizerName)}</strong><small>${escapeHtml(item.meta||'Organisateur')}</small></div>
-    </div>
 
     <div class="detail-tabs premium">${tabs}</div>
     <div class="detail-content premium">${renderDetailPanels(item)}</div>
