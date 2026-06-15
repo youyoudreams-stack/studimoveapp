@@ -539,6 +539,45 @@ require_once __DIR__ . '/auth_config.php';
     .profile-about-title{font-size:14px;font-weight:950;color:#101828;margin:0 0 10px;letter-spacing:-.2px}
     .profile-about-text{font-size:14px;color:#344054;line-height:1.7;margin:0}
     .profile-bio{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+
+    /* ── Event Media Block ── */
+    .event-media-block{margin:16px 0}
+    /* Mobile slider */
+    .event-media-desktop{display:none}
+    .event-media-mobile{position:relative;border-radius:20px;overflow:hidden}
+    .event-media-slider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-radius:20px}
+    .event-media-slider::-webkit-scrollbar{display:none}
+    .event-media-slide,.gallery-item-video{flex:0 0 100%;height:220px;background-size:cover;background-position:center;scroll-snap-align:start;cursor:pointer;position:relative}
+    .gallery-play-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:42px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.5);background:rgba(0,0,0,.18)}
+    .gallery-pill-btn{position:absolute;bottom:12px;right:12px;background:#fff;border:0;border-radius:999px;padding:7px 14px;font-size:12px;font-weight:850;color:#101828;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:5;white-space:nowrap}
+    .gallery-pill-btn:hover{background:#f4f8ff}
+    /* Desktop grid */
+    @media(min-width:640px){
+      .event-media-mobile{display:none}
+      .event-media-desktop{display:grid;grid-template-columns:1fr 1fr;gap:6px;border-radius:20px;overflow:hidden;height:320px}
+      .event-media-main{background-size:cover;background-position:center;cursor:pointer;height:100%;grid-row:span 2}
+      .event-media-aside{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:6px;position:relative}
+      .event-media-aside-img,.gallery-item-video{background-size:cover;background-position:center;cursor:pointer;border-radius:0}
+    }
+    @media(min-width:860px){
+      .event-media-desktop{grid-template-columns:3fr 2fr;height:380px}
+    }
+
+    /* ── Gallery Modal ── */
+    .gallery-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.92);display:none;flex-direction:column;align-items:center;justify-content:center}
+    .gallery-overlay.open{display:flex}
+    .gallery-top-bar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;z-index:10}
+    .gallery-counter{font-size:14px;font-weight:850;color:rgba(255,255,255,.7)}
+    .gallery-close-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:0;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+    .gallery-slider-inner{width:100%;max-width:900px;max-height:75vh;display:flex;align-items:center;justify-content:center;padding:0 60px}
+    .gallery-main-img{max-width:100%;max-height:75vh;border-radius:16px;object-fit:contain;display:block}
+    .gallery-video-frame{width:100%;max-width:820px;aspect-ratio:16/9;border:0;border-radius:16px}
+    .gallery-nav-btn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border:0;color:#fff;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s;z-index:10}
+    .gallery-nav-btn:hover{background:rgba(255,255,255,.28)}
+    .gallery-prev{left:12px}.gallery-next{right:12px}
+    .gallery-dots{display:flex;gap:6px;justify-content:center;position:absolute;bottom:20px;left:0;right:0}
+    .gallery-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);border:0;cursor:pointer;padding:0;transition:all .18s}
+    .gallery-dot.active{background:#fff;width:20px;border-radius:999px}
     .detail-video-box iframe{width:100%;height:260px;border:0;border-radius:22px;background:#000;box-shadow:0 14px 34px rgba(16,24,40,.14)}.detail-whatsapp{display:flex;justify-content:center;align-items:center;margin-top:14px;padding:13px 16px;border-radius:999px;background:#e9fbf0;color:#067647;text-decoration:none;font-weight:950;border:1px solid #bbf7d0}
     @media(min-width:900px){.detail-meta-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.detail-gallery-grid.premium{grid-template-columns:repeat(4,minmax(0,1fr))}.detail-gallery-img.premium{height:150px}.detail-video-box iframe{height:360px}}
 
@@ -618,7 +657,17 @@ require_once __DIR__ . '/auth_config.php';
   </aside>
   <section class="detail-overlay" id="detailOverlay" aria-hidden="true"></section>
   <div class="profile-overlay" id="profileOverlay" aria-hidden="true"></div>
+  <div class="gallery-overlay" id="galleryOverlay">
+    <div class="gallery-top-bar">
+      <span class="gallery-counter">1 / 1</span>
+      <button class="gallery-close-btn" id="closeGalleryBtn">×</button>
+    </div>
+    <div class="gallery-slider-inner"></div>
+    <button class="gallery-nav-btn gallery-prev">‹</button>
+    <button class="gallery-nav-btn gallery-next">›</button>
+    <div class="gallery-dots"></div>
+  </div>
   <div class="toast" id="toast"></div>
-  <script src="app.js?v=profile-interests-v1"></script>
+  <script src="app.js?v=gallery-v1"></script>
 </body>
 </html>

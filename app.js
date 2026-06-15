@@ -107,6 +107,8 @@ const DEMO_EVENTS = [
     interested:312, going:87, likes:248, comments:34,
     slogan:"Le soleil, la Sagrada Familia et 200 étudiants en folie.",
     details:"4 jours inoubliables à Barcelone : vol A/R, hôtel en centre-ville, soirée welcome party, visite guidée de la Sagrada Familia, beach day, et soirée de clôture sur le toit d'un hôtel 4 étoiles. Places limitées à 200 étudiants.",
+    gallery:[img.barcelona,'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80','https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?w=800&q=80','https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80','https://images.unsplash.com/photo-1517760444937-f6397edcbbcd?w=800&q=80','https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80'],
+    video_url:'https://www.youtube.com/embed/l3DP3YvSGY0',
     ticketing_url:'#', whatsapp_url:'#',
   },
   {
@@ -119,6 +121,8 @@ const DEMO_EVENTS = [
     interested:890, going:412, likes:631, comments:89,
     slogan:'8 écoles, 1 dancefloor, 1 nuit.',
     details:"Le Wanderlust ouvre ses portes aux étudiants parisiens pour la soirée de l'année. 3 salles, 5 DJs, open bar premium les 2 premières heures. Dress code : tenue de soirée.",
+    gallery:[img.night,'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&q=80','https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&q=80','https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&q=80','https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&q=80'],
+    video_url:'https://www.youtube.com/embed/AaronSmith-Dancin',
     ticketing_url:'#', whatsapp_url:'#',
   },
   {
@@ -131,6 +135,8 @@ const DEMO_EVENTS = [
     interested:540, going:198, likes:412, comments:56,
     slogan:'La montagne comme tu ne l\'as jamais vécue.',
     details:"7 nuits en chalet partagé, forfait ski 6 jours, navette aller-retour depuis Paris, Lyon et Bordeaux incluse. Soirées après-ski organisées chaque soir. Niveau débutant à expert accepté.",
+    gallery:[img.ski,'https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=800&q=80','https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&q=80','https://images.unsplash.com/photo-1548777834-c3e74d7e6b97?w=800&q=80','https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800&q=80','https://images.unsplash.com/photo-1542224566-6e85f2e6772f?w=800&q=80','https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800&q=80'],
+    video_url:'https://www.youtube.com/embed/0jmCTim5h6M',
     ticketing_url:'#', whatsapp_url:'#',
   },
   {
@@ -602,12 +608,93 @@ function renderEventMetaGrid(item){
 function renderMediaGallery(item){
   const gallery=[item.image1,item.image2,item.image3,item.image4].filter(Boolean);
   const imgs=(gallery.length?gallery:(item.gallery||[])).filter(Boolean).slice(0,4);
+  /* legacy fallback — kept for non-gallery items */
   if(!imgs.length) return '';
   return `<div class="detail-gallery-title">Photos</div><div class="detail-gallery-grid premium">${imgs.map((u,i)=>`<button class="detail-gallery-img premium" type="button" style="background-image:url('${u}')" aria-label="Image ${i+1}"></button>`).join('')}</div>`;
 }
 function renderVideo(item){
   if(!item.video_url) return '';
   return `<div class="detail-video-box"><div class="detail-gallery-title">Vidéo</div><iframe src="${safeUrl(item.video_url)}" title="Vidéo ${escapeHtml(item.title)}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+}
+function buildMediaItems(item){
+  const imgs=(item.gallery&&item.gallery.length?item.gallery:[item.image1,item.image2,item.image3,item.image4,item.hero_image||item.image].filter(Boolean)).slice(0,7);
+  const all=[...imgs];
+  if(item.video_url) all.push({type:'video',url:item.video_url,thumb:`https://img.youtube.com/vi/${getYoutubeId(item.video_url)}/hqdefault.jpg`});
+  return all.map(m=>typeof m==='string'?{type:'image',url:m}:m);
+}
+function getYoutubeId(url){
+  const m=url.match(/embed\/([^?&]+)/); return m?m[1]:'';
+}
+function renderEventMediaBlock(item){
+  const media=buildMediaItems(item);
+  if(!media.length) return '';
+  const galleryIcon=`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`;
+  const galBtn=`<button class="gallery-pill-btn" data-open-gallery="${escapeHtml(item.id)}" data-gallery-idx="0">${galleryIcon} Galerie</button>`;
+  const thumbOf=(m,cls='',idx=0)=>m.type==='video'
+    ?`<div class="${cls} gallery-item-video" data-open-gallery="${escapeHtml(item.id)}" data-gallery-idx="${idx}" style="background-image:url('${m.thumb}')"><div class="gallery-play-icon">▶</div></div>`
+    :`<div class="${cls}" data-open-gallery="${escapeHtml(item.id)}" data-gallery-idx="${idx}" style="background-image:url('${m.url}')"></div>`;
+
+  // Mobile: horizontal slider
+  const mobileSlides=media.map((m,i)=>thumbOf(m,'event-media-slide',i)).join('');
+  const mobileHtml=`<div class="event-media-mobile"><div class="event-media-slider">${mobileSlides}</div>${galBtn}</div>`;
+
+  // Desktop: hero + grid
+  const aside=media.slice(1,5).map((m,i)=>thumbOf(m,'event-media-aside-img',i+1)).join('');
+  const desktopHtml=`<div class="event-media-desktop">${thumbOf(media[0],'event-media-main',0)}<div class="event-media-aside">${aside}${media.length>1?galBtn:''}</div></div>`;
+
+  return `<div class="event-media-block">${desktopHtml}${mobileHtml}</div>`;
+}
+let galleryState={items:[],idx:0,itemId:''};
+function openGallery(itemId,startIdx=0){
+  const item=findItemById(itemId); if(!item) return;
+  const media=buildMediaItems(item);
+  galleryState={items:media,idx:startIdx,itemId};
+  const overlay=$('#galleryOverlay');
+  overlay.classList.add('open');
+  document.body.style.overflow='hidden';
+  renderGallerySlide();
+  bindGallerySwipe();
+}
+function closeGallery(){
+  const overlay=$('#galleryOverlay');
+  overlay.classList.remove('open');
+  document.body.style.overflow='';
+  overlay.querySelector('.gallery-slider-inner').innerHTML='';
+  overlay.querySelector('.gallery-dots').innerHTML='';
+}
+function renderGallerySlide(){
+  const {items,idx}=galleryState;
+  const m=items[idx];
+  const inner=$('#galleryOverlay .gallery-slider-inner');
+  if(m.type==='video'){
+    const vid_id=getYoutubeId(m.url);
+    inner.innerHTML=`<iframe class="gallery-video-frame" src="https://www.youtube.com/embed/${vid_id}?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  } else {
+    inner.innerHTML=`<img class="gallery-main-img" src="${m.url}" alt="Photo ${idx+1}">`;
+  }
+  // dots
+  const dots=$('#galleryOverlay .gallery-dots');
+  dots.innerHTML=items.map((_,i)=>`<button class="gallery-dot${i===idx?' active':''}" data-gallery-go="${i}"></button>`).join('');
+  // counter
+  $('#galleryOverlay .gallery-counter').textContent=`${idx+1} / ${items.length}`;
+  // nav buttons
+  $('#galleryOverlay .gallery-prev').style.display=idx>0?'flex':'none';
+  $('#galleryOverlay .gallery-next').style.display=idx<items.length-1?'flex':'none';
+}
+function galleryGoTo(idx){
+  const {items}=galleryState;
+  if(idx<0||idx>=items.length) return;
+  galleryState.idx=idx;
+  renderGallerySlide();
+}
+function bindGallerySwipe(){
+  const inner=$('#galleryOverlay .gallery-slider-inner');
+  let startX=0;
+  inner.addEventListener('touchstart',e=>{startX=e.touches[0].clientX},{passive:true});
+  inner.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-startX;
+    if(Math.abs(dx)>50) galleryGoTo(galleryState.idx+(dx<0?1:-1));
+  },{passive:true});
 }
 function renderEventBox(item){
   const hasBilletterie = item.ticketing_url && item.ticketing_url !== '#';
@@ -651,8 +738,7 @@ function renderDetailPanels(item){
     <div class="detail-section-card">
       <h3>Détails</h3>
       ${renderEventMetaGrid(item)}
-      ${renderMediaGallery(item)}
-      ${renderVideo(item)}
+      ${renderEventMediaBlock(item)}
       ${item.whatsapp_url?`<a class="detail-whatsapp" href="${safeUrl(item.whatsapp_url)}" target="_blank" rel="noopener">Rejoindre le WhatsApp</a>`:''}
     </div>
   </div>`;
@@ -1076,6 +1162,11 @@ function bindEvents(){
   document.addEventListener('click',(e)=>{
     const closeBtn=e.target.closest('#closeDetailBtn'); if(closeBtn){closeDetail();return}
     const closeProfileBtn=e.target.closest('#closeProfileBtn'); if(closeProfileBtn){closeProfile();return}
+    const closeGalleryBtn=e.target.closest('#closeGalleryBtn,#galleryOverlayBg'); if(closeGalleryBtn){closeGallery();return}
+    const galleryOpen=e.target.closest('[data-open-gallery]'); if(galleryOpen){openGallery(galleryOpen.dataset.openGallery,parseInt(galleryOpen.dataset.galleryIdx||'0'));return}
+    const galleryPrev=e.target.closest('.gallery-prev'); if(galleryPrev){galleryGoTo(galleryState.idx-1);return}
+    const galleryNext=e.target.closest('.gallery-next'); if(galleryNext){galleryGoTo(galleryState.idx+1);return}
+    const galleryDot=e.target.closest('[data-gallery-go]'); if(galleryDot){galleryGoTo(parseInt(galleryDot.dataset.galleryGo));return}
     const profileTab=e.target.closest('[data-profile-tab]'); if(profileTab){setProfileTab(profileTab.dataset.profileTab);return}
     const connectBtn=e.target.closest('#profileConnectBtn,[data-user-id].profile-conn-btn'); if(connectBtn&&connectBtn.dataset.userId){handleConnect(connectBtn.dataset.userId);return}
     const personCard=e.target.closest('[data-user-id].person-card'); if(personCard){openProfile(personCard.dataset.userId);return}
