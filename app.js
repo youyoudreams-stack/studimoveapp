@@ -571,8 +571,8 @@ function renderFeed(){
 }
 function setActiveFeed(feed){state.activeFeed=feed;$all('.feed-tab').forEach(btn=>btn.classList.toggle('active',btn.dataset.feed===feed));track('feed_tab_change',{feed_tab:feed});renderFeed()}
 function renderPeopleList(kind){
-  const label = kind === 'going' ? 'Inscrit' : 'Intéressé';
-  return `<div class="people-list">${people.map((p,i)=>`<div class="person-row"><div class="person-avatar" style="background-image:url('${p.avatar}')"></div><div class="person-main"><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.school)}</span></div><span class="person-badge">${label}</span></div>`).join('')}</div>`;
+  const label = kind === 'going' ? 'Inscrit' : kind === 'interested' ? 'Intéressé' : null;
+  return `<div class="people-list">${people.map(p=>`<div class="person-row"><div class="person-avatar" style="background-image:url('${p.avatar}')"></div><div class="person-main"><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.school)}</span></div>${label?`<span class="person-badge">${label}</span>`:''}</div>`).join('')}</div>`;
 }
 function renderComments(){
   return `<div class="comments-list">${comments.map(c=>`<div class="comment-row"><div class="comment-avatar" style="background-image:url('${c.avatar}')"></div><div class="comment-main"><strong>${escapeHtml(c.name)} · <span style="display:inline;color:#98A2B3">${escapeHtml(c.time)}</span></strong><span class="comment-text">${escapeHtml(c.text)}</span></div></div>`).join('')}</div><div class="comment-box"><input class="comment-input" placeholder="Écrire un commentaire..." /><button class="comment-send" data-comment-send="1">Envoyer</button></div>`;
@@ -625,12 +625,61 @@ function renderEventBox(item){
 }
 function renderDetailPanels(item){
   const isEvent=item.type==='event';
-  const detailsText = item.details || item.text || '';
-  const detailPanel = `<div class="detail-panel active" data-panel="details"><div class="detail-section-card"><h3>Détails</h3><p class="detail-text">${escapeHtml(detailsText)}</p>${renderEventMetaGrid(item)}${isEvent?renderEventBox(item):''}${renderMediaGallery(item)}${renderVideo(item)}${item.whatsapp_url?`<a class="detail-whatsapp" href="${safeUrl(item.whatsapp_url)}" target="_blank" rel="noopener">Rejoindre le WhatsApp</a>`:''}</div></div>`;
-  const interestedPanel = isEvent ? `<div class="detail-panel" data-panel="interested"><div class="detail-event-box"><h3>Personnes intéressées</h3>${renderPeopleList('interested')}</div></div>` : '';
-  const goingPanel = isEvent ? `<div class="detail-panel" data-panel="going"><div class="detail-event-box"><h3>Personnes inscrites</h3>${renderPeopleList('going')}</div></div>` : '';
-  const commentsPanel = `<div class="detail-panel" data-panel="comments"><div class="detail-event-box"><h3>Commentaires</h3>${renderComments()}</div></div>`;
-  return detailPanel + interestedPanel + goingPanel + commentsPanel;
+  const descText = item.details || item.text || '';
+  const programText = item.program || '';
+
+  const infoPanel = `<div class="detail-panel active" data-panel="infos">
+    <div class="detail-section-card">
+      <h3>À propos</h3>
+      <p class="detail-text">${escapeHtml(descText)}</p>
+      ${isEvent?renderEventBox(item):''}
+    </div>
+  </div>`;
+
+  const detailsPanel = `<div class="detail-panel" data-panel="details">
+    <div class="detail-section-card">
+      <h3>Détails</h3>
+      ${renderEventMetaGrid(item)}
+      ${renderMediaGallery(item)}
+      ${renderVideo(item)}
+      ${item.whatsapp_url?`<a class="detail-whatsapp" href="${safeUrl(item.whatsapp_url)}" target="_blank" rel="noopener">Rejoindre le WhatsApp</a>`:''}
+    </div>
+  </div>`;
+
+  const programPanel = `<div class="detail-panel" data-panel="programme">
+    <div class="detail-section-card">
+      <h3>Programme</h3>
+      ${programText
+        ? `<p class="detail-text">${escapeHtml(programText)}</p>`
+        : `<p class="detail-text" style="color:#98A2B3;font-style:italic">Le programme détaillé sera publié prochainement par l'organisateur.</p>`
+      }
+    </div>
+  </div>`;
+
+  const participantsPanel = isEvent ? `<div class="detail-panel" data-panel="participants">
+    <div class="detail-section-card">
+      <h3>Participants</h3>
+      <div class="participants-filter">
+        <button class="pf-btn active" data-pf="all">Tous</button>
+        <button class="pf-btn" data-pf="interested">Intéressés</button>
+        <button class="pf-btn" data-pf="going">Inscrits</button>
+      </div>
+      <div id="participantsList">
+        <div data-pf-group="all">${renderPeopleList('all')}</div>
+        <div data-pf-group="interested" style="display:none">${renderPeopleList('interested')}</div>
+        <div data-pf-group="going" style="display:none">${renderPeopleList('going')}</div>
+      </div>
+    </div>
+  </div>` : '';
+
+  const commentsPanel = `<div class="detail-panel" data-panel="comments">
+    <div class="detail-section-card">
+      <h3>Commentaires</h3>
+      ${renderComments()}
+    </div>
+  </div>`;
+
+  return infoPanel + detailsPanel + programPanel + (isEvent?participantsPanel:'') + commentsPanel;
 }
 function renderDetail(item){
   const isEvent=item.type==='event';
@@ -639,8 +688,8 @@ function renderDetail(item){
   const organizerLogo=item.organizer_logo||item.initials;
   const subtitle=item.slogan||item.meta||'';
   const tabs = isEvent
-    ? `<button class="detail-tab active" data-detail-tab="details">Détails</button><button class="detail-tab" data-detail-tab="interested">Intéressés</button><button class="detail-tab" data-detail-tab="going">Inscrits</button><button class="detail-tab" data-detail-tab="comments">Commentaires</button>`
-    : `<button class="detail-tab active" data-detail-tab="details">Détails</button><button class="detail-tab" data-detail-tab="comments">Commentaires</button>`;
+    ? `<button class="detail-tab active" data-detail-tab="infos">Infos</button><button class="detail-tab" data-detail-tab="details">Détails</button><button class="detail-tab" data-detail-tab="programme">Programme</button><button class="detail-tab" data-detail-tab="participants">Participants</button><button class="detail-tab" data-detail-tab="comments">Commentaires</button>`
+    : `<button class="detail-tab active" data-detail-tab="infos">Infos</button><button class="detail-tab" data-detail-tab="details">Détails</button><button class="detail-tab" data-detail-tab="comments">Commentaires</button>`;
 
   return `<div class="detail-shell premium-detail">
     <div class="detail-top premium">
@@ -834,6 +883,7 @@ function bindEvents(){
     const closeBtn=e.target.closest('#closeDetailBtn'); if(closeBtn){closeDetail();return}
     const tab=e.target.closest('[data-detail-tab]'); if(tab){setDetailTab(tab.dataset.detailTab);return}
     const eventAction=e.target.closest('[data-event-action]'); if(eventAction){handleEventAction(eventAction.dataset.eventAction,eventAction.dataset.eventId);return}
+    const pfBtn=e.target.closest('[data-pf]'); if(pfBtn&&pfBtn.classList.contains('pf-btn')){const filter=pfBtn.dataset.pf;document.querySelectorAll('.pf-btn').forEach(b=>b.classList.toggle('active',b.dataset.pf===filter));document.querySelectorAll('[data-pf-group]').forEach(g=>g.style.display=g.dataset.pfGroup===filter?'':'none');return}
     const commentSend=e.target.closest('[data-comment-send]'); if(commentSend){track('comment_send_click');showToast('Commentaire bientôt connecté');return}
     const favBtn=e.target.closest('[data-fav]'); if(favBtn){e.preventDefault();e.stopPropagation();toggleFavorite(favBtn.dataset.fav,favBtn);return}
     const category=e.target.closest('[data-category]'); if(category){setActiveCategory(category.dataset.category);return}
