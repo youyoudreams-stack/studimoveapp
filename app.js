@@ -59,12 +59,20 @@ const img = {
   rooftop:'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1200&q=80',
   escape:'https://images.unsplash.com/photo-1560472355-536de3962603?auto=format&fit=crop&w=1200&q=80',
 };
+const INTERESTS = [
+  {emoji:'🌍',label:'Voyages'},{emoji:'🎉',label:'Soirées'},{emoji:'🏀',label:'Sport'},
+  {emoji:'🎵',label:'Musique'},{emoji:'🎨',label:'Culture'},{emoji:'🍕',label:'Food'},
+  {emoji:'🎮',label:'Gaming'},{emoji:'📸',label:'Photo'},{emoji:'🎬',label:'Cinéma'},
+  {emoji:'📚',label:'Études'},{emoji:'🏋️',label:'Fitness'},{emoji:'🎸',label:'Concerts'},
+  {emoji:'🌿',label:'Nature'},{emoji:'✈️',label:'Road trips'},{emoji:'🏖️',label:'Plage'},
+  {emoji:'🎭',label:'Théâtre'},{emoji:'🍻',label:'Bar & apéro'},{emoji:'🏔️',label:'Montagne'},
+];
 const people = [
-  {id:'u1', name:'Lina Martin', username:'@lina.move', school:'Kedge · Marseille', avatar:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80', bio:'Étudiante en M2 Marketing ✨ Fan de voyages et de bonne musique 🎶', connectionStatus:'none', stats:{connections:142,events:14,badges:5}, badges:['🌍 Voyageuse','🎉 Festivalière','⭐ Early Bird'], privacy:{posts:'public',events:'public',connections:'public'}},
-  {id:'u2', name:'Yanis Benali', username:'@yanis.b', school:'Digital College · Paris', avatar:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80', bio:'Dev web & passionné de soirées 🚀 Toujours partant pour un plan 😎', connectionStatus:'pending', stats:{connections:87,events:9,badges:3}, badges:['🏆 Top connecteur','🎮 Gamer'], privacy:{posts:'public',events:'public',connections:'connections'}},
-  {id:'u3', name:'Emma Leroy', username:'@emma.leroy', school:'ESG · Bordeaux', avatar:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80', bio:'Future juriste 👩‍⚖️ Bordeaux forever 🍷 Sorties culturelles et rooftops', connectionStatus:'connected', stats:{connections:203,events:21,badges:8}, badges:['🎨 Culturelle','🍷 Bordelaise','🌟 VIP'], privacy:{posts:'connections',events:'public',connections:'public'}},
-  {id:'u4', name:'Nolan Petit', username:'@nolan.petit', school:'Campus Paris', avatar:'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&q=80', bio:'Sport & musique 🏀🎸 Toujours dispo pour sortir à Paris', connectionStatus:'none', stats:{connections:56,events:7,badges:2}, badges:['🏀 Sportif'], privacy:{posts:'public',events:'connections',connections:'connections'}},
-  {id:'u5', name:'Sofia Moreau', username:'@sofia.m', school:'Kedge · Marseille', avatar:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80', bio:'Marketing & influence 📸 Marseille dans le cœur 💙', connectionStatus:'none', stats:{connections:318,events:32,badges:11}, badges:['📸 Influenceuse','🌊 Marseillaise','🔥 Top actif'], privacy:{posts:'public',events:'public',connections:'public'}},
+  {id:'u1', name:'Lina Martin', username:'@lina.move', school:'Kedge · Marseille', avatar:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=160&q=80', bio:'Étudiante en M2 Marketing ✨ Fan de voyages et de bonne musique 🎶', about:"Passionnée par le marketing digital et les réseaux sociaux, je suis actuellement en M2 à Kedge Marseille. J'adore organiser des sorties, découvrir de nouveaux endroits et créer des souvenirs inoubliables avec mes amis. Toujours partante pour un road trip improvisé ou une soirée qui finit au lever du soleil 🌅", interests:['Voyages','Soirées','Musique','Photo','Road trips'], connectionStatus:'none', stats:{connections:142,events:14,badges:5}, badges:['🌍 Voyageuse','🎉 Festivalière','⭐ Early Bird'], privacy:{posts:'public',events:'public',connections:'public'}},
+  {id:'u2', name:'Yanis Benali', username:'@yanis.b', school:'Digital College · Paris', avatar:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80', bio:'Dev web & passionné de soirées 🚀 Toujours partant pour un plan 😎', about:"Développeur web en alternance le jour, fêtard la nuit 😄 Je code des trucs cool au Digital College Paris et je sors dès que j'en ai l'occasion. Fan de gaming, de concerts electro et de bonne bouffe. Si t'as un plan, compte sur moi.", interests:['Gaming','Soirées','Concerts','Food','Musique'], connectionStatus:'pending', stats:{connections:87,events:9,badges:3}, badges:['🏆 Top connecteur','🎮 Gamer'], privacy:{posts:'public',events:'public',connections:'connections'}},
+  {id:'u3', name:'Emma Leroy', username:'@emma.leroy', school:'ESG · Bordeaux', avatar:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80', bio:'Future juriste 👩‍⚖️ Bordeaux forever 🍷 Sorties culturelles et rooftops', about:"En M1 Droit des affaires à l'ESG Bordeaux. Bordeaux c'est la meilleure ville de France et j'en suis fière 🍷 J'aime les expos, le théâtre, les rooftops et les soirées un peu chics. Mais aussi les randos en Gironde le weekend. La vie c'est fait pour être vécu à fond.", interests:['Culture','Théâtre','Voyages','Plage','Études'], connectionStatus:'connected', stats:{connections:203,events:21,badges:8}, badges:['🎨 Culturelle','🍷 Bordelaise','🌟 VIP'], privacy:{posts:'connections',events:'public',connections:'public'}},
+  {id:'u4', name:'Nolan Petit', username:'@nolan.petit', school:'Campus Paris', avatar:'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=160&q=80', bio:'Sport & musique 🏀🎸 Toujours dispo pour sortir à Paris', about:"Étudiant en licence STAPS à Paris. Le sport c'est ma vie — basket, fitness, tennis. La musique aussi, je joue de la guitare depuis 10 ans. Paris est une ville incroyable pour sortir et rencontrer du monde. Je cherche des potes pour des matchs impro ou des concerts.", interests:['Sport','Fitness','Musique','Concerts','Bar & apéro'], connectionStatus:'none', stats:{connections:56,events:7,badges:2}, badges:['🏀 Sportif'], privacy:{posts:'public',events:'connections',connections:'connections'}},
+  {id:'u5', name:'Sofia Moreau', username:'@sofia.m', school:'Kedge · Marseille', avatar:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80', bio:'Marketing & influence 📸 Marseille dans le cœur 💙', about:"Content creator et étudiante en Marketing à Kedge. J'ai grandi à Marseille et je ne partirai jamais 🌊 Passionnée de photographie, de voyages et de mode. Je documente ma vie étudiante sur les réseaux et j'adore découvrir de nouveaux spots. Let's connect !", interests:['Photo','Voyages','Soirées','Plage','Food'], connectionStatus:'none', stats:{connections:318,events:32,badges:11}, badges:['📸 Influenceuse','🌊 Marseillaise','🔥 Top actif'], privacy:{posts:'public',events:'public',connections:'public'}},
 ];
 const comments = [
   {name:'Lina Martin', text:"Trop chaud, ça a l'air incroyable !", time:'il y a 8 min', avatar:people[0].avatar},
@@ -990,6 +998,7 @@ function renderProfile(person){
       <div class="profile-handle">${escapeHtml(person.username)}</div>
       <div class="profile-school-tag">🎓 ${escapeHtml(person.school)}</div>
       <p class="profile-bio">${escapeHtml(person.bio)}</p>
+      ${person.interests&&person.interests.length?`<div class="profile-interests-row">${person.interests.map(i=>{const found=INTERESTS.find(x=>x.label===i);return `<span class="profile-interest-chip">${found?found.emoji+' ':''} ${escapeHtml(i)}</span>`;}).join('')}</div>`:''}
       <div class="profile-cta-row">
         <button class="profile-connect-btn ${connectClass}" id="profileConnectBtn" data-user-id="${escapeHtml(person.id)}">${connectLabel}</button>
         <button class="profile-msg-btn" title="Message">
@@ -1007,10 +1016,22 @@ function renderProfile(person){
       <button class="profile-tab active" data-profile-tab="posts">Posts</button>
       <button class="profile-tab" data-profile-tab="events">Événements</button>
       <button class="profile-tab" data-profile-tab="connections">Connexions</button>
+      <button class="profile-tab" data-profile-tab="about">À propos</button>
     </div>
     <div class="profile-panel active" id="profilePanelPosts">${postsHtml}</div>
     <div class="profile-panel" id="profilePanelEvents">${eventsHtml}</div>
     <div class="profile-panel" id="profilePanelConnections">${connsHtml}</div>
+    <div class="profile-panel" id="profilePanelAbout">
+      <div class="profile-about-section">
+        <h4 class="profile-about-title">Qui suis-je ?</h4>
+        <p class="profile-about-text">${escapeHtml(person.about||'Aucune description renseignée.')}</p>
+      </div>
+      ${person.interests&&person.interests.length?`
+      <div class="profile-about-section">
+        <h4 class="profile-about-title">Centres d'intérêt</h4>
+        <div class="profile-interests-grid">${person.interests.map(i=>{const found=INTERESTS.find(x=>x.label===i);return `<span class="profile-interest-chip large">${found?found.emoji+' ':''} ${escapeHtml(i)}</span>`;}).join('')}</div>
+      </div>`:''}
+    </div>
   `;
 }
 function openProfile(userId){

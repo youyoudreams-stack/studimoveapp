@@ -531,6 +531,14 @@ require_once __DIR__ . '/auth_config.php';
     .profile-conn-btn{margin-left:auto;border:1.5px solid var(--line);border-radius:12px;padding:7px 14px;font-size:12px;font-weight:850;color:#344054;background:#fff;cursor:pointer;white-space:nowrap}
     .profile-privacy-lock{display:inline-flex;align-items:center;gap:5px;background:#f4f8ff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:13px;font-weight:750;color:#667085;width:100%;margin-bottom:12px}
     .profile-empty{text-align:center;color:#98A2B3;font-size:14px;font-weight:700;padding:32px 0}
+    .profile-interests-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:16px}
+    .profile-interest-chip{display:inline-flex;align-items:center;gap:4px;background:#f4f8ff;border:1.5px solid #e0ecff;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:850;color:var(--blue);white-space:nowrap}
+    .profile-interest-chip.large{font-size:13px;padding:7px 16px;background:#fff;border-color:var(--line);color:#344054}
+    .profile-interests-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .profile-about-section{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:12px;box-shadow:var(--shadow)}
+    .profile-about-title{font-size:14px;font-weight:950;color:#101828;margin:0 0 10px;letter-spacing:-.2px}
+    .profile-about-text{font-size:14px;color:#344054;line-height:1.7;margin:0}
+    .profile-bio{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
     .detail-video-box iframe{width:100%;height:260px;border:0;border-radius:22px;background:#000;box-shadow:0 14px 34px rgba(16,24,40,.14)}.detail-whatsapp{display:flex;justify-content:center;align-items:center;margin-top:14px;padding:13px 16px;border-radius:999px;background:#e9fbf0;color:#067647;text-decoration:none;font-weight:950;border:1px solid #bbf7d0}
     @media(min-width:900px){.detail-meta-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.detail-gallery-grid.premium{grid-template-columns:repeat(4,minmax(0,1fr))}.detail-gallery-img.premium{height:150px}.detail-video-box iframe{height:360px}}
 
@@ -611,6 +619,6 @@ require_once __DIR__ . '/auth_config.php';
   <section class="detail-overlay" id="detailOverlay" aria-hidden="true"></section>
   <div class="profile-overlay" id="profileOverlay" aria-hidden="true"></div>
   <div class="toast" id="toast"></div>
-  <script src="app.js?v=profile-overlay-v1"></script>
+  <script src="app.js?v=profile-interests-v1"></script>
 </body>
 </html>

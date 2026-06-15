@@ -77,6 +77,8 @@ require_once __DIR__ . '/auth_config.php';
     .auth-link{color:#0B6CFF;font-weight:750;text-decoration:none;transition:opacity .15s}
     .auth-link:hover{opacity:.75}
 
+    .interest-chip{background:#f4f8ff;border:1.5px solid #e0ecff;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:750;color:#344054;cursor:pointer;transition:all .15s ease;white-space:nowrap}
+    .interest-chip.selected{background:linear-gradient(90deg,#0B6CFF,#00D4FF);border-color:transparent;color:#fff;box-shadow:0 4px 12px rgba(11,108,255,.25)}
     @media(max-width:520px){.fields-grid{grid-template-columns:1fr}.auth-card{padding:24px 20px 22px;border-radius:24px}.auth-brand-name{font-size:38px}}
   </style>
 </head>
@@ -88,41 +90,63 @@ require_once __DIR__ . '/auth_config.php';
     <div class="auth-brand-tagline">Partagez, voyagez, vibrez !</div>
   </div>
 
-  <main class="auth-card">
-    <h1 class="auth-title">Crée ton compte 🚀</h1>
-    <p class="auth-sub">Rejoins des milliers d'étudiants qui vivent des aventures uniques.</p>
+  <main class="auth-card" id="authCard">
 
-    <form id="registerForm">
+    <!-- Étape 1 : Infos -->
+    <div id="step1">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <div style="flex:1;height:4px;border-radius:999px;background:linear-gradient(90deg,#0B6CFF,#00D4FF)"></div>
+        <div style="flex:1;height:4px;border-radius:999px;background:#e9eef7"></div>
+        <span style="font-size:11px;font-weight:850;color:#98A2B3;white-space:nowrap">1 / 2</span>
+      </div>
+      <h1 class="auth-title">Crée ton compte 🚀</h1>
+      <p class="auth-sub">Rejoins des milliers d'étudiants qui vivent des aventures uniques.</p>
       <div class="fields-grid">
         <div class="field">
           <label>Prénom</label>
-          <input name="first_name" autocomplete="given-name" placeholder="Léa" required>
+          <input id="f_first_name" name="first_name" autocomplete="given-name" placeholder="Léa" required>
         </div>
         <div class="field">
           <label>Nom</label>
-          <input name="last_name" autocomplete="family-name" placeholder="Martin">
+          <input id="f_last_name" name="last_name" autocomplete="family-name" placeholder="Martin">
         </div>
         <div class="field full">
           <label>Email</label>
-          <input name="email" type="email" autocomplete="email" placeholder="ton@email.fr" required>
+          <input id="f_email" name="email" type="email" autocomplete="email" placeholder="ton@email.fr" required>
         </div>
         <div class="field full">
           <label>Pseudo</label>
-          <input name="username" placeholder="ex : lea.move" required>
+          <input id="f_username" name="username" placeholder="ex : lea.move" required>
         </div>
         <div class="field full">
           <label>Mot de passe</label>
           <div class="pw-wrap">
-            <input name="password" id="passwordInput" type="password" autocomplete="new-password" minlength="8" placeholder="8 caractères minimum" required>
+            <input id="passwordInput" name="password" type="password" autocomplete="new-password" minlength="8" placeholder="8 caractères minimum" required>
             <button type="button" class="pw-toggle" id="togglePassword" aria-label="Voir le mot de passe">
               <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
         </div>
       </div>
-      <button class="submit-btn" type="submit">Créer mon compte</button>
-      <div id="error" class="error-box"></div>
-    </form>
+      <button class="submit-btn" id="nextStepBtn" type="button">Suivant →</button>
+      <div id="error1" class="error-box"></div>
+    </div>
+
+    <!-- Étape 2 : Centres d'intérêt -->
+    <div id="step2" style="display:none">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <div style="flex:1;height:4px;border-radius:999px;background:linear-gradient(90deg,#0B6CFF,#00D4FF)"></div>
+        <div style="flex:1;height:4px;border-radius:999px;background:linear-gradient(90deg,#0B6CFF,#00D4FF)"></div>
+        <span style="font-size:11px;font-weight:850;color:#98A2B3;white-space:nowrap">2 / 2</span>
+      </div>
+      <h1 class="auth-title">Tes centres d'intérêt 🎯</h1>
+      <p class="auth-sub">Choisis au moins 3 centres d'intérêt pour personnaliser ton expérience.</p>
+      <div id="interestsGrid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px"></div>
+      <p id="interestCount" style="font-size:12px;color:#98A2B3;font-weight:750;margin-bottom:16px;margin-top:8px">0 sélectionné(s) — min. 3</p>
+      <button class="submit-btn" id="submitBtn" type="button" disabled style="opacity:.5">Créer mon compte</button>
+      <div id="error2" class="error-box"></div>
+      <button type="button" id="backStepBtn" style="width:100%;margin-top:10px;background:none;border:0;color:#667085;font-size:13px;font-weight:750;cursor:pointer;padding:8px">← Retour</button>
+    </div>
 
     <div class="auth-links">
       Déjà un compte ? <a class="auth-link" href="login.php">Se connecter</a>
@@ -132,6 +156,42 @@ require_once __DIR__ . '/auth_config.php';
 </div>
 
 <script>
+const INTERESTS = [
+  {emoji:'🌍',label:'Voyages'},{emoji:'🎉',label:'Soirées'},{emoji:'🏀',label:'Sport'},
+  {emoji:'🎵',label:'Musique'},{emoji:'🎨',label:'Culture'},{emoji:'🍕',label:'Food'},
+  {emoji:'🎮',label:'Gaming'},{emoji:'📸',label:'Photo'},{emoji:'🎬',label:'Cinéma'},
+  {emoji:'📚',label:'Études'},{emoji:'🏋️',label:'Fitness'},{emoji:'🎸',label:'Concerts'},
+  {emoji:'🌿',label:'Nature'},{emoji:'✈️',label:'Road trips'},{emoji:'🏖️',label:'Plage'},
+  {emoji:'🎭',label:'Théâtre'},{emoji:'🍻',label:'Bar & apéro'},{emoji:'🏔️',label:'Montagne'},
+];
+const selectedInterests = new Set();
+
+// Build interests grid
+const grid = document.getElementById('interestsGrid');
+INTERESTS.forEach(({emoji, label}) => {
+  const chip = document.createElement('button');
+  chip.type = 'button';
+  chip.className = 'interest-chip';
+  chip.innerHTML = `${emoji} ${label}`;
+  chip.dataset.label = label;
+  chip.addEventListener('click', () => {
+    if(selectedInterests.has(label)){
+      selectedInterests.delete(label);
+      chip.classList.remove('selected');
+    } else {
+      selectedInterests.add(label);
+      chip.classList.add('selected');
+    }
+    const count = selectedInterests.size;
+    document.getElementById('interestCount').textContent = `${count} sélectionné(s) — min. 3`;
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = count < 3;
+    btn.style.opacity = count < 3 ? '.5' : '1';
+  });
+  grid.appendChild(chip);
+});
+
+// Password toggle
 document.getElementById('togglePassword').addEventListener('click', function(){
   const inp = document.getElementById('passwordInput');
   const icon = document.getElementById('eyeIcon');
@@ -144,25 +204,54 @@ document.getElementById('togglePassword').addEventListener('click', function(){
   }
 });
 
+// Step navigation
+document.getElementById('nextStepBtn').addEventListener('click', () => {
+  const err = document.getElementById('error1');
+  err.style.display = 'none';
+  const fn = document.getElementById('f_first_name').value.trim();
+  const em = document.getElementById('f_email').value.trim();
+  const un = document.getElementById('f_username').value.trim();
+  const pw = document.getElementById('passwordInput').value;
+  if(!fn || !em || !un || pw.length < 8){
+    err.textContent = !fn ? 'Le prénom est requis.' : !em ? 'L\'email est requis.' : !un ? 'Le pseudo est requis.' : 'Mot de passe trop court (min. 8 caractères).';
+    err.style.display = 'block'; return;
+  }
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('step2').style.display = 'block';
+  document.getElementById('authCard').scrollTop = 0;
+});
+document.getElementById('backStepBtn').addEventListener('click', () => {
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step1').style.display = 'block';
+});
+
+// Submit
 const ERRORS = {
   EMAIL_ALREADY_EXISTS: 'Un compte existe déjà avec cet email.',
   USERNAME_INVALID: 'Le pseudo doit contenir au moins 3 caractères.',
   PASSWORD_TOO_SHORT: 'Le mot de passe doit contenir au moins 8 caractères.',
   REGISTER_FAILED: 'Création impossible. Le pseudo est peut-être déjà utilisé.'
 };
-document.getElementById('registerForm').addEventListener('submit', async function(e){
-  e.preventDefault();
-  const error = document.getElementById('error');
-  const btn = e.currentTarget.querySelector('.submit-btn');
+document.getElementById('submitBtn').addEventListener('click', async function(){
+  const error = document.getElementById('error2');
+  const btn = this;
   error.style.display = 'none';
   btn.textContent = 'Création en cours…';
   btn.disabled = true;
 
-  const fd = new FormData(e.currentTarget);
   const res = await fetch('api/auth.php', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action:'register', first_name:fd.get('first_name'), last_name:fd.get('last_name'), email:fd.get('email'), username:fd.get('username'), password:fd.get('password'), marque:'studimove' })
+    body: JSON.stringify({
+      action:'register',
+      first_name: document.getElementById('f_first_name').value.trim(),
+      last_name: document.getElementById('f_last_name').value.trim(),
+      email: document.getElementById('f_email').value.trim(),
+      username: document.getElementById('f_username').value.trim(),
+      password: document.getElementById('passwordInput').value,
+      interests: Array.from(selectedInterests),
+      marque:'studimove'
+    })
   });
 
   const data = await res.json();
