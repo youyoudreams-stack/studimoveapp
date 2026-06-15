@@ -118,7 +118,8 @@ require_once __DIR__ . '/auth_config.php';
     .detail-event-box h3{margin:0 0 10px;font-size:16px;font-weight:950}.event-detail-stats{display:grid;grid-template-columns:1fr;gap:10px}.event-detail-stat{background:#fff;border:1px solid #e8eef8;border-radius:18px;padding:12px}.event-detail-stat strong{display:block;font-size:20px}.event-detail-stat span{font-size:12px;color:#667085;font-weight:800}
     .event-cta-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
     .event-cta{border:0;border-radius:18px;padding:13px 12px;font-weight:950;cursor:pointer}
-    .event-cta.interest{background:#f4f8ff;color:#0B6CFF;border:1px solid #dbeafe}
+    .event-cta.interest{background:#f4f8ff;color:#0B6CFF;border:1px solid #dbeafe;transition:all .18s ease}
+    .event-cta.interest.active{background:linear-gradient(90deg,#e0f0ff,#d4f5ff);color:#0B6CFF;border-color:#0B6CFF;box-shadow:0 0 0 3px rgba(11,108,255,.12)}
     .event-cta.join{background:linear-gradient(90deg,var(--blue),var(--cyan));color:#fff;box-shadow:0 8px 20px rgba(11,108,255,.18)}
     .detail-tabs{position:sticky;top:58px;z-index:3;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);display:flex;gap:8px;overflow-x:auto;padding:10px 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
     .detail-tabs::-webkit-scrollbar{display:none}
@@ -652,6 +653,97 @@ require_once __DIR__ . '/auth_config.php';
       .sdg-overlay{padding:26px}
     }
 
+    /* ── Booking overlay ── */
+    .booking-overlay{position:fixed;inset:0;z-index:9000;display:flex;align-items:flex-end;justify-content:center;pointer-events:none;visibility:hidden;transition:visibility 0s linear .32s}
+    .booking-overlay.open{pointer-events:all;visibility:visible;transition:visibility 0s}
+    .bk-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .28s ease}
+    .booking-overlay.open .bk-backdrop{background:rgba(10,20,50,.52)}
+    .bk-sheet{position:relative;width:100%;max-width:560px;background:#fff;border-radius:28px 28px 0 0;max-height:92dvh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .32s cubic-bezier(.32,1,.46,1);box-shadow:0 -8px 48px rgba(0,0,0,.18)}
+    .booking-overlay.open .bk-sheet{transform:translateY(0)}
+    @media(min-width:640px){.bk-sheet{border-radius:28px;max-height:88dvh;margin-bottom:40px}}
+    .bk-header{padding:14px 20px 0;flex-shrink:0;display:flex;flex-direction:column;gap:12px;border-bottom:1px solid var(--line)}
+    .bk-header-row{display:flex;align-items:center;justify-content:space-between}
+    .bk-close{width:32px;height:32px;border-radius:50%;border:0;background:#f4f6fb;color:#667085;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1}
+    .bk-prog{display:flex;gap:6px;align-items:center;padding-bottom:14px}
+    .bk-prog-dot{width:8px;height:8px;border-radius:50%;background:#e9eef7;transition:all .22s ease}
+    .bk-prog-dot.active{width:22px;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--cyan))}
+    .bk-body{overflow-y:auto;flex:1;padding:20px;-webkit-overflow-scrolling:touch}
+    .bk-section{margin-bottom:22px}
+    .bk-section-title{font-size:11px;font-weight:950;color:#98A2B3;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+    .bk-event-header{display:flex;gap:12px;align-items:center;margin-bottom:20px}
+    .bk-event-img{width:56px;height:56px;border-radius:14px;background-size:cover;background-position:center;flex-shrink:0}
+    .bk-event-title{font-size:16px;font-weight:950;color:#101828;letter-spacing:-.2px;line-height:1.25}
+    .bk-event-meta{font-size:12px;font-weight:700;color:#667085;margin-top:3px}
+    /* Qty stepper */
+    .bk-qty-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#f9fafb;border-radius:16px;border:1.5px solid var(--line)}
+    .bk-qty-label{font-size:14px;font-weight:850;color:#344054}
+    .bk-qty-sub{font-size:11px;font-weight:700;color:#98A2B3;margin-top:1px}
+    .bk-stepper{display:flex;align-items:center;gap:12px}
+    .bk-step-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid #dbeafe;background:#fff;color:var(--blue);font-size:22px;font-weight:950;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1;transition:all .15s}
+    .bk-step-btn:active{transform:scale(.93)}
+    .bk-qty-val{font-size:20px;font-weight:950;color:#101828;min-width:22px;text-align:center}
+    /* Options */
+    .bk-opt-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);margin-bottom:8px;cursor:pointer;transition:all .18s}
+    .bk-opt-row.selected{border-color:var(--blue);background:#f0f7ff}
+    .bk-opt-emoji{font-size:22px;flex-shrink:0}
+    .bk-opt-info{flex:1}
+    .bk-opt-label{font-size:14px;font-weight:850;color:#101828}
+    .bk-opt-price{font-size:12px;font-weight:750;color:#667085}
+    .bk-opt-check{width:22px;height:22px;border-radius:50%;border:2px solid #d0d5dd;background:#fff;flex-shrink:0;transition:all .18s;display:flex;align-items:center;justify-content:center}
+    .bk-opt-row.selected .bk-opt-check{background:var(--blue);border-color:var(--blue);color:#fff;font-size:13px}
+    .bk-opt-row.selected .bk-opt-check::after{content:'✓'}
+    /* Transport radios */
+    .bk-transport-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:14px;border:1.5px solid var(--line);margin-bottom:8px;cursor:pointer;transition:all .18s}
+    .bk-transport-row.selected{border-color:var(--blue);background:#f0f7ff}
+    .bk-transport-label{flex:1;font-size:14px;font-weight:850;color:#101828}
+    .bk-transport-price{font-size:13px;font-weight:950;color:var(--blue)}
+    .bk-radio{width:20px;height:20px;border-radius:50%;border:2px solid #d0d5dd;flex-shrink:0;transition:all .18s;display:flex;align-items:center;justify-content:center}
+    .bk-transport-row.selected .bk-radio{border-color:var(--blue)}
+    .bk-transport-row.selected .bk-radio::after{content:'';width:10px;height:10px;border-radius:50%;background:var(--blue);display:block}
+    /* Footer sticky */
+    .bk-footer{position:sticky;bottom:0;margin:0 -20px -20px;padding:14px 20px;border-top:1px solid var(--line);background:#fff;display:flex;align-items:center;gap:12px;z-index:2}
+    .bk-total{flex:1}
+    .bk-total-label{font-size:11px;font-weight:750;color:#98A2B3}
+    .bk-total-price{font-size:22px;font-weight:950;color:#101828;letter-spacing:-.5px}
+    .bk-cta{border:0;border-radius:16px;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#fff;padding:14px 24px;font-weight:950;font-size:15px;cursor:pointer;box-shadow:0 8px 20px rgba(11,108,255,.22);transition:filter .18s;white-space:nowrap}
+    .bk-cta:hover{filter:brightness(1.08)}
+    .bk-back{border:0;background:none;color:#667085;font-size:13px;font-weight:750;cursor:pointer;padding:0}
+    /* Step 2: order summary */
+    .bk-summary-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px;font-weight:750;color:#344054}
+    .bk-summary-row:last-child{border-bottom:0}
+    .bk-summary-row.total-row{font-size:16px;font-weight:950;color:#101828;padding-top:13px}
+    /* Payment options */
+    .bk-pay-opt{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:14px;border:1.5px solid var(--line);margin-bottom:8px;cursor:pointer;transition:all .18s}
+    .bk-pay-opt.selected{border-color:var(--blue);background:#f0f7ff}
+    .bk-pay-icon{font-size:22px;flex-shrink:0}
+    .bk-pay-info{flex:1}
+    .bk-pay-label{font-size:14px;font-weight:850;color:#101828}
+    .bk-pay-sub{font-size:12px;font-weight:700;color:#667085}
+    /* Step 3: CB form */
+    .bk-field{margin-bottom:14px}
+    .bk-field label{display:block;font-size:11px;font-weight:950;color:#344054;margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase}
+    .bk-field input{width:100%;background:#f9fafb;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;font-family:inherit;color:#111;outline:none;transition:border-color .18s,box-shadow .18s}
+    .bk-field input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(11,108,255,.10)}
+    .bk-fields-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .bk-secure-note{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#667085;margin-top:10px}
+    .bk-ancv-msg{background:#fffbeb;border:1.5px solid #fde68a;border-radius:16px;padding:16px;text-align:center}
+    .bk-ancv-emoji{font-size:32px;margin-bottom:8px}
+    .bk-ancv-title{font-size:15px;font-weight:950;color:#92400e;margin-bottom:6px}
+    .bk-ancv-text{font-size:13px;font-weight:700;color:#78350f;line-height:1.5}
+    /* Step 4: success */
+    .bk-success{text-align:center;padding:10px 0 20px}
+    .bk-success-icon{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 18px}
+    .bk-success-title{font-size:22px;font-weight:950;color:#101828;letter-spacing:-.4px;margin-bottom:8px}
+    .bk-success-ref{font-size:12px;font-weight:850;color:#667085;margin-bottom:24px}
+    .bk-invite-label{font-size:14px;font-weight:850;color:#344054;margin-bottom:12px;text-align:left}
+    .bk-invite-slot{display:flex;align-items:center;gap:10px;padding:11px 14px;background:#f9fafb;border-radius:14px;border:1.5px solid var(--line);margin-bottom:8px}
+    .bk-invite-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#e0f2fe,#bfdbfe);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+    .bk-invite-name{flex:1;font-size:14px;font-weight:850;color:#344054}
+    .bk-invite-actions{display:flex;gap:6px}
+    .bk-invite-btn{border:0;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:850;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s}
+    .bk-invite-btn.wa{background:#e8fdf1;color:#059669}
+    .bk-invite-btn.mail{background:#eff6ff;color:var(--blue)}
+
   </style>
 </head>
 <body>
@@ -704,7 +796,26 @@ require_once __DIR__ . '/auth_config.php';
     <button class="gallery-nav-btn gallery-next">›</button>
     <div class="gallery-dots"></div>
   </div>
+  <!-- Booking overlay -->
+  <div class="booking-overlay" id="bookingOverlay" aria-hidden="true">
+    <div id="bookingOverlayBg" class="bk-backdrop"></div>
+    <div class="bk-sheet">
+      <div class="bk-header">
+        <div class="bk-header-row">
+          <button class="bk-close" id="closeBookingBtn" aria-label="Fermer">×</button>
+          <div class="bk-prog">
+            <div class="bk-prog-dot active"></div>
+            <div class="bk-prog-dot"></div>
+            <div class="bk-prog-dot"></div>
+            <div class="bk-prog-dot"></div>
+          </div>
+          <div style="width:32px"></div>
+        </div>
+      </div>
+      <div class="bk-body" id="bookingBody"></div>
+    </div>
+  </div>
   <div class="toast" id="toast"></div>
-  <script src="app.js?v=event-detail-v5"></script>
+  <script src="app.js?v=booking-v6"></script>
 </body>
 </html>
