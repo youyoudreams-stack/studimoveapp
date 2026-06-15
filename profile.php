@@ -101,6 +101,7 @@ $session_token = $_COOKIE[AUTH_COOKIE_NAME] ?? '';
 
     /* ── Bottom nav ── */
     .bottom-nav{position:fixed;left:0;right:0;bottom:0;width:100%;height:56px;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:6px 18px 8px;z-index:20}
+    @media(min-width:780px){.bottom-nav{display:none}.app-main{padding-bottom:28px}}
     .bottom-item{border:0;background:transparent;color:#98A2B3;font-size:0;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:0;text-decoration:none}
     .bottom-item .ico{width:34px;height:34px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:21px;line-height:1;transition:.18s ease}
     .bottom-item.active{color:var(--blue)}
