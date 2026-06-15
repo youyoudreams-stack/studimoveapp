@@ -233,8 +233,8 @@ $session_token = $_COOKIE[AUTH_COOKIE_NAME] ?? '';
 
   <nav class="bottom-nav" aria-label="Navigation principale">
     <a class="bottom-item" href="index.php" aria-label="Accueil"><span class="ico">⌂</span></a>
-    <button class="bottom-item" type="button" onclick="showToast('Recherche bientôt disponible')" aria-label="Recherche"><span class="ico">⌕</span></button>
-    <button class="bottom-item" type="button" onclick="showToast('Favoris bientôt disponible')" aria-label="Favoris"><span class="ico">♡</span></button>
+    <a class="bottom-item" href="search.php" aria-label="Recherche"><span class="ico">⌕</span></a>
+    <a class="bottom-item" href="favorites.php" aria-label="Favoris"><span class="ico">♡</span></a>
     <a class="bottom-item active" href="profile.php" aria-label="Profil"><span class="ico">◉</span></a>
   </nav>
 </div>
@@ -250,12 +250,12 @@ $session_token = $_COOKIE[AUTH_COOKIE_NAME] ?? '';
   </div>
   <div class="drawer-menu">
     <a class="drawer-link" href="index.php"><span class="menu-ico">⌂</span>Accueil</a>
-    <button class="drawer-link" type="button" onclick="showToast('Communauté bientôt disponible')"><span class="menu-ico">👥</span>Communauté</button>
+    <a class="drawer-link" href="community.php"><span class="menu-ico">👥</span>Communauté</a>
     <a class="drawer-link active" href="profile.php"><span class="menu-ico">◉</span>Mon profil</a>
-    <button class="drawer-link" type="button" onclick="showToast('Favoris bientôt disponible')"><span class="menu-ico">♥</span>Mes favoris</button>
-    <button class="drawer-link" type="button" onclick="showToast('Réservations bientôt disponible')"><span class="menu-ico">▣</span>Mes réservations</button>
-    <button class="drawer-link" type="button" onclick="showToast('Paramètres bientôt disponibles')"><span class="menu-ico">⚙</span>Paramètres</button>
-    <button class="drawer-link" type="button" onclick="showToast('Support bientôt disponible')"><span class="menu-ico">?</span>Aide & support</button>
+    <a class="drawer-link" href="favorites.php"><span class="menu-ico">♥</span>Mes favoris</a>
+    <a class="drawer-link" href="reservations.php"><span class="menu-ico">▣</span>Mes réservations</a>
+    <a class="drawer-link" href="settings.php"><span class="menu-ico">⚙</span>Paramètres</a>
+    <a class="drawer-link" href="support.php"><span class="menu-ico">?</span>Aide & support</a>
   </div>
   <div class="drawer-footer">
     <button class="drawer-link logout-link" id="drawerLogoutBtn" type="button"><span class="menu-ico">↩</span>Se déconnecter</button>

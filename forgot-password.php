@@ -9,35 +9,72 @@ require_once __DIR__ . '/auth_config.php';
   <title>Mot de passe oublié — StudiMove</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    :root{--violet:#6f45e9;--bg:#f7f6fb;--text:#111827;--muted:#6b7280;--line:#e5e7eb}
-    *{box-sizing:border-box} body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-    .card{width:100%;max-width:430px;background:#fff;border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:0 18px 50px rgba(17,24,39,.08)}
-    .brand{font-size:28px;font-weight:900;color:var(--violet);margin-bottom:6px}
-    h1{margin:0 0 8px;font-size:24px}.muted{color:var(--muted);font-size:14px;margin-bottom:24px}
-    label{display:block;font-size:13px;font-weight:800;margin:14px 0 7px}
-    input{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px 15px;font-size:15px;outline:none}
-    button{width:100%;border:0;border-radius:16px;background:var(--violet);color:#fff;padding:14px 16px;font-weight:900;font-size:15px;margin-top:18px;cursor:pointer}
-    .msg{display:none;margin-top:14px;border-radius:14px;padding:12px;font-size:13px}
-    .ok{background:#dcfce7;color:#166534}.err{background:#fee2e2;color:#b91c1c}
-    a{display:block;margin-top:18px;text-align:center;color:var(--violet);font-weight:800;text-decoration:none;font-size:13px}
+    :root{--blue:#0B6CFF;--cyan:#00D4FF;--yellow:#FFD000;--line:#e9eef7;--soft:#f4f8ff;--text:#111111;--muted:#667085}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;color:var(--text)}
+    body{overflow-x:hidden;background:#f4f8ff}
+
+    .auth-shell{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden}
+    .auth-shell:before{content:"";position:absolute;top:-120px;left:-120px;width:420px;height:420px;background:radial-gradient(circle,rgba(11,108,255,.13) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+    .auth-shell:after{content:"";position:absolute;bottom:-80px;right:-80px;width:320px;height:320px;background:radial-gradient(circle,rgba(0,212,255,.10) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+
+    .auth-card{width:100%;max-width:440px;background:#fff;border:1px solid var(--line);border-radius:32px;padding:36px 32px 32px;box-shadow:0 24px 64px rgba(11,108,255,.10),0 4px 16px rgba(0,0,0,.06);position:relative;z-index:1}
+
+    .brand{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+    .brand-logo{width:44px;height:44px;border-radius:16px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(11,108,255,.28)}
+    .brand-logo svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .brand-name{font-size:22px;font-weight:950;letter-spacing:-.6px}
+    .brand-studi{color:var(--blue)}.brand-move{color:var(--yellow)}
+
+    .auth-title{font-size:26px;font-weight:950;letter-spacing:-.6px;margin:0 0 6px;color:#101828}
+    .auth-sub{font-size:14px;color:var(--muted);font-weight:650;margin:0 0 28px;line-height:1.5}
+
+    .field{margin-bottom:16px}
+    .field label{display:block;font-size:13px;font-weight:850;color:#344054;margin-bottom:7px}
+    .field input{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:13px 16px;font-size:15px;font-family:inherit;outline:none;background:#fff;color:var(--text);transition:border-color .18s ease,box-shadow .18s ease}
+    .field input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(11,108,255,.10)}
+    .field input::placeholder{color:#98A2B3}
+
+    .submit-btn{width:100%;border:0;border-radius:16px;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#fff;padding:15px 16px;font-weight:950;font-size:15px;font-family:inherit;margin-top:8px;cursor:pointer;box-shadow:0 8px 24px rgba(11,108,255,.28);transition:filter .18s ease,transform .18s ease;letter-spacing:-.1px}
+    .submit-btn:hover{filter:brightness(1.06);transform:translateY(-1px)}
+    .submit-btn:active{transform:translateY(0)}
+
+    .msg-box{display:none;margin-top:14px;border-radius:14px;padding:12px 16px;font-size:13px;font-weight:750;line-height:1.4}
+    .msg-box.ok{background:#e9fbf0;border:1px solid #bbf7d0;color:#067647}
+    .msg-box.err{background:#fff1f2;border:1px solid #fecdd3;color:#be123c}
+
+    .auth-links{text-align:center;margin-top:24px;padding-top:20px;border-top:1px solid var(--line)}
+    .auth-link{color:var(--blue);font-weight:850;text-decoration:none;font-size:13px;transition:opacity .15s ease}
+    .auth-link:hover{opacity:.75}
+
+    @media(max-width:480px){.auth-card{padding:28px 22px 24px;border-radius:28px}}
   </style>
 </head>
 <body>
-<div class="wrap">
-  <main class="card">
-    <div class="brand">StudiMove</div>
-    <h1>Mot de passe oublié</h1>
-    <p class="muted">Indique ton email. Si un compte existe, tu recevras un lien de réinitialisation.</p>
+<div class="auth-shell">
+  <main class="auth-card">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="brand-name"><span class="brand-studi">Studi</span><span class="brand-move">move</span></div>
+    </div>
+
+    <h1 class="auth-title">Mot de passe oublié ?</h1>
+    <p class="auth-sub">Indique ton email. Si un compte existe, tu recevras un lien de réinitialisation dans les minutes qui suivent.</p>
 
     <form id="forgotForm">
-      <label>Email</label>
-      <input name="email" type="email" required>
-      <button type="submit">Envoyer le lien</button>
-      <div id="msg" class="msg"></div>
+      <div class="field">
+        <label>Email</label>
+        <input name="email" type="email" autocomplete="email" placeholder="ton@email.fr" required>
+      </div>
+      <button class="submit-btn" type="submit">Envoyer le lien</button>
+      <div id="msg" class="msg-box"></div>
     </form>
 
-    <a href="login.php">Retour connexion</a>
+    <div class="auth-links">
+      <a class="auth-link" href="login.php">← Retour à la connexion</a>
+    </div>
   </main>
 </div>
 
@@ -45,29 +82,29 @@ require_once __DIR__ . '/auth_config.php';
 document.getElementById('forgotForm').addEventListener('submit', async function(e){
   e.preventDefault();
   const msg = document.getElementById('msg');
+  const btn = e.currentTarget.querySelector('.submit-btn');
   msg.style.display = 'none';
+  btn.textContent = 'Envoi en cours…';
+  btn.disabled = true;
 
   const fd = new FormData(e.currentTarget);
-
   try {
     const res = await fetch('api/auth.php', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        action: 'forgot_password',
-        email: fd.get('email'),
-        marque: 'studimove'
-      })
+      body: JSON.stringify({ action:'forgot_password', email:fd.get('email'), marque:'studimove' })
     });
-
     const data = await res.json();
-    msg.className = 'msg ok';
+    msg.className = 'msg-box ok';
     msg.textContent = data.message || 'Si un compte existe, un email sera envoyé.';
     msg.style.display = 'block';
-  } catch(e) {
-    msg.className = 'msg err';
+    btn.textContent = 'Email envoyé ✓';
+  } catch {
+    msg.className = 'msg-box err';
     msg.textContent = 'Erreur technique. Réessaie.';
     msg.style.display = 'block';
+    btn.textContent = 'Envoyer le lien';
+    btn.disabled = false;
   }
 });
 </script>
