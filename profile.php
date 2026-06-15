@@ -99,6 +99,30 @@ $session_token = $_COOKIE[AUTH_COOKIE_NAME] ?? '';
     .logout-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:1px solid #fecdd3;background:#fff5f6;color:#e11d48;border-radius:18px;padding:14px;font-size:14px;font-weight:950;cursor:pointer;transition:background .15s ease}
     .logout-btn:hover{background:#fee2e2}
 
+    /* ── Aperçu public overlay ── */
+    .preview-overlay{position:fixed;inset:0;z-index:200;background:#f4f8ff;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);overflow-y:auto}
+    .preview-overlay.open{transform:translateX(0)}
+    .preview-top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:14px 16px;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+    .preview-top-title{flex:1;text-align:center;font-size:14px;font-weight:950;color:#111}
+    .preview-back-btn{width:38px;height:38px;border:0;background:#f7faff;border-radius:999px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .preview-banner{background:linear-gradient(135deg,var(--blue),var(--cyan));height:100px;position:relative}
+    .preview-avatar-wrap{position:absolute;bottom:-38px;left:50%;transform:translateX(-50%)}
+    .preview-avatar{width:80px;height:80px;border-radius:50%;border:4px solid #fff;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:950;color:#fff;box-shadow:0 8px 24px rgba(11,108,255,.28)}
+    .preview-body{padding:52px 18px 24px;text-align:center}
+    .preview-name{font-size:22px;font-weight:950;letter-spacing:-.4px;margin:0 0 4px}
+    .preview-school{font-size:13px;color:#667085;font-weight:700;margin:0 0 6px}
+    .preview-bio{font-size:14px;color:#344054;line-height:1.4;font-weight:600;margin:0 0 14px}
+    .preview-interests{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:20px}
+    .preview-chip{background:#f4f8ff;border:1.5px solid #e0ecff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:750;color:var(--blue)}
+    .preview-stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 -18px 20px}
+    .preview-stat{text-align:center;padding:14px 0;border-right:1px solid var(--line)}
+    .preview-stat:last-child{border-right:0}
+    .preview-stat strong{display:block;font-size:20px;font-weight:950;color:var(--blue)}
+    .preview-stat span{font-size:11px;color:#98A2B3;font-weight:800}
+    .preview-badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px}
+    .preview-badge{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:850}
+    .preview-note{font-size:12px;color:#98A2B3;font-weight:700;font-style:italic;margin-top:8px}
+
     /* ── Bottom nav ── */
     .bottom-nav{position:fixed;left:0;right:0;bottom:0;width:100%;height:56px;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:6px 18px 8px;z-index:20}
     @media(min-width:780px){.bottom-nav{display:none}.app-main{padding-bottom:28px}}
@@ -130,10 +154,15 @@ $session_token = $_COOKIE[AUTH_COOKIE_NAME] ?? '';
     <div class="profile-hero">
       <div class="profile-top-row">
         <div class="avatar-circle" id="avatarCircle">S</div>
-        <button class="edit-profile-btn" type="button" id="editProfileBtn">
-          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-          Modifier
-        </button>
+        <div style="display:flex;gap:8px">
+          <button class="edit-profile-btn" type="button" id="previewProfileBtn" style="background:linear-gradient(90deg,var(--blue),var(--cyan));color:#fff;border-color:transparent">
+            👁 Aperçu
+          </button>
+          <button class="edit-profile-btn" type="button" id="editProfileBtn">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            Modifier
+          </button>
+        </div>
       </div>
       <p class="profile-name" id="profileName">Chargement…</p>
       <p class="profile-school" id="profileSchool">Étudiant</p>
@@ -239,6 +268,34 @@ $session_token = $_COOKIE[AUTH_COOKIE_NAME] ?? '';
   </nav>
 </div>
 
+<!-- Aperçu public overlay -->
+<div class="preview-overlay" id="previewOverlay" aria-hidden="true">
+  <div class="preview-top">
+    <button class="preview-back-btn" id="closePreviewBtn">‹</button>
+    <div class="preview-top-title">Vue publique de mon profil</div>
+    <div style="width:38px"></div>
+  </div>
+  <div class="preview-banner"></div>
+  <div class="preview-avatar-wrap"><div class="preview-avatar" id="previewAvatar">S</div></div>
+  <div class="preview-body">
+    <p class="preview-name" id="previewName">Mon profil</p>
+    <p class="preview-school" id="previewSchool">Étudiant</p>
+    <p class="preview-bio" id="previewBio">Étudiant passionné de voyages et de nouvelles rencontres ✨</p>
+    <div class="preview-interests" id="previewInterests"></div>
+    <div class="preview-stats">
+      <div class="preview-stat"><strong>0</strong><span>Connexions</span></div>
+      <div class="preview-stat"><strong>0</strong><span>Événements</span></div>
+      <div class="preview-stat"><strong>0</strong><span>Badges</span></div>
+    </div>
+    <div class="preview-badges" id="previewBadges">
+      <span class="preview-badge">✈️ Premier voyage</span>
+      <span class="preview-badge">🎉 Noctambule</span>
+      <span class="preview-badge">💡 Bon plan</span>
+    </div>
+    <p class="preview-note">C'est ainsi que les autres étudiants voient ton profil.</p>
+  </div>
+</div>
+
 <div class="drawer-backdrop" id="drawerBackdrop"></div>
 <aside class="drawer" id="drawer" aria-hidden="true">
   <div class="drawer-head">
@@ -310,6 +367,7 @@ async function fetchReservations() {
 }
 
 function renderUser(user) {
+  window._profileUser = user;
   const initial = (user.username || user.email || 'S')[0].toUpperCase();
   const displayName = user.username ? '@' + user.username : user.email || 'Étudiant';
   const fullName = user.full_name || user.username || user.email?.split('@')[0] || 'Mon compte';
@@ -377,6 +435,30 @@ async function logout() {
 document.getElementById('logoutBtn').addEventListener('click', logout);
 document.getElementById('drawerLogoutBtn').addEventListener('click', logout);
 document.getElementById('editProfileBtn').addEventListener('click', () => showToast('Modification du profil bientôt disponible'));
+
+const previewOverlay = document.getElementById('previewOverlay');
+function openPreview(user) {
+  const initial = (user.username || user.email || 'S')[0].toUpperCase();
+  document.getElementById('previewAvatar').textContent = initial;
+  document.getElementById('previewName').textContent = user.full_name || user.username || 'Mon profil';
+  document.getElementById('previewSchool').textContent = user.school || 'Étudiant';
+  document.getElementById('previewBio').textContent = user.bio || 'Étudiant passionné de voyages et de nouvelles rencontres ✨';
+  const interests = user.interests || [];
+  document.getElementById('previewInterests').innerHTML = interests.map(i=>`<span class="preview-chip">${i}</span>`).join('');
+  previewOverlay.classList.add('open');
+  previewOverlay.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+}
+function closePreview() {
+  previewOverlay.classList.remove('open');
+  previewOverlay.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+}
+document.getElementById('previewProfileBtn').addEventListener('click', () => {
+  if (window._profileUser) openPreview(window._profileUser);
+  else showToast('Chargement du profil en cours…');
+});
+document.getElementById('closePreviewBtn').addEventListener('click', closePreview);
 
 const openBtn = document.getElementById('openMenuBtn');
 const closeBtn = document.getElementById('closeMenuBtn');

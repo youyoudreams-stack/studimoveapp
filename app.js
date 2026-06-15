@@ -75,9 +75,9 @@ const people = [
   {id:'u5', name:'Sofia Moreau', username:'@sofia.m', school:'Kedge · Marseille', avatar:'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80', bio:'Marketing & influence 📸 Marseille dans le cœur 💙', about:"Content creator et étudiante en Marketing à Kedge. J'ai grandi à Marseille et je ne partirai jamais 🌊 Passionnée de photographie, de voyages et de mode. Je documente ma vie étudiante sur les réseaux et j'adore découvrir de nouveaux spots. Let's connect !", interests:['Photo','Voyages','Soirées','Plage','Food'], connectionStatus:'none', stats:{connections:318,events:32,badges:11}, badges:['📸 Influenceuse','🌊 Marseillaise','🔥 Top actif'], privacy:{posts:'public',events:'public',connections:'public'}},
 ];
 const comments = [
-  {name:'Lina Martin', text:"Trop chaud, ça a l'air incroyable !", time:'il y a 8 min', avatar:people[0].avatar},
-  {name:'Yanis Benali', text:"On peut venir avec des potes d'une autre école ?", time:'il y a 22 min', avatar:people[1].avatar},
-  {name:'Emma Leroy', text:"Je veux plus d'infos sur le transport.", time:'il y a 1 h', avatar:people[2].avatar},
+  {name:'Lina Martin', text:"Trop chaud, ça a l'air incroyable !", time:'il y a 8 min', avatar:people[0].avatar, status:'going'},
+  {name:'Yanis Benali', text:"On peut venir avec des potes d'une autre école ?", time:'il y a 22 min', avatar:people[1].avatar, status:'interested'},
+  {name:'Emma Leroy', text:"Je veux plus d'infos sur le transport.", time:'il y a 1 h', avatar:people[2].avatar, status:'interested'},
 ];
 
 const profileImgs = people.slice(0,4).map(p=>p.avatar);
@@ -109,6 +109,12 @@ const DEMO_EVENTS = [
     details:"4 jours inoubliables à Barcelone : vol A/R, hôtel en centre-ville, soirée welcome party, visite guidée de la Sagrada Familia, beach day, et soirée de clôture sur le toit d'un hôtel 4 étoiles. Places limitées à 200 étudiants.",
     gallery:[img.barcelona,'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80','https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?w=800&q=80','https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80','https://images.unsplash.com/photo-1517760444937-f6397edcbbcd?w=800&q=80','https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80'],
     video_url:'https://www.youtube.com/embed/l3DP3YvSGY0',
+    program:[
+      {time:'Jour 1', title:'Arrivée & Welcome Party', desc:"Check-in hôtel, découverte du groupe. Soirée de bienvenue en rooftop avec les 200 participants."},
+      {time:'Jour 2', title:'Sagrada Família & Beach Day', desc:"Visite guidée le matin, afternoon à la Barceloneta. Dîner libre dans le Barrio Gótico."},
+      {time:'Jour 3', title:'Journée libre & Soirée thématique', desc:"Explorez la ville à votre rythme. Le soir, soirée déguisée organisée dans un club partenaire."},
+      {time:'Jour 4', title:'Clôture & Retour', desc:"Brunch de clôture, échanges de contacts et transfert aéroport. À très vite pour le prochain trip !"},
+    ],
     ticketing_url:'#', whatsapp_url:'#',
   },
   {
@@ -123,6 +129,12 @@ const DEMO_EVENTS = [
     details:"Le Wanderlust ouvre ses portes aux étudiants parisiens pour la soirée de l'année. 3 salles, 5 DJs, open bar premium les 2 premières heures. Dress code : tenue de soirée.",
     gallery:[img.night,'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&q=80','https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&q=80','https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&q=80','https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800&q=80'],
     video_url:'https://www.youtube.com/embed/AaronSmith-Dancin',
+    program:[
+      {time:'22h00', title:'Ouverture des portes', desc:"Accueil, vestiaires et welcome drink offert les 30 premières minutes."},
+      {time:'22h30', title:'DJ Opening — Salle 1', desc:"DJ Sofiane ouvre les feux. Ambiance progressive house."},
+      {time:'00h00', title:'Peak Time — 3 salles ouvertes', desc:"House, R&B et rap : chacun trouve sa salle. DJ principal en scène centrale."},
+      {time:'02h30', title:'Closing Set', desc:"Le dernier set pour finir la nuit en apothéose. Fermeture 4h."},
+    ],
     ticketing_url:'#', whatsapp_url:'#',
   },
   {
@@ -137,6 +149,12 @@ const DEMO_EVENTS = [
     details:"7 nuits en chalet partagé, forfait ski 6 jours, navette aller-retour depuis Paris, Lyon et Bordeaux incluse. Soirées après-ski organisées chaque soir. Niveau débutant à expert accepté.",
     gallery:[img.ski,'https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=800&q=80','https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&q=80','https://images.unsplash.com/photo-1548777834-c3e74d7e6b97?w=800&q=80','https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800&q=80','https://images.unsplash.com/photo-1542224566-6e85f2e6772f?w=800&q=80','https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800&q=80'],
     video_url:'https://www.youtube.com/embed/0jmCTim5h6M',
+    program:[
+      {time:'7 Fév — Arrivée', title:'Navette & Installation', desc:"Départ des villes partenaires (Paris, Lyon, Bordeaux). Arrivée chalet, dîner de bienvenue."},
+      {time:'8-12 Fév — Ski', title:'Forfait 6 jours + Après-ski', desc:"Pistes ouvertes 9h-17h. Cours collectifs débutants J1 matin. Soirées après-ski organisées chaque soir."},
+      {time:'13 Fév — Soirée de clôture', title:'Grande soirée finale', desc:"Le meilleur pour la fin : soirée déguisée au chalet avec DJ et bar partenaire."},
+      {time:'14 Fév — Retour', title:'Départ & navette retour', desc:"Départ après petit-déjeuner. Retour dans les villes de départ."},
+    ],
     ticketing_url:'#', whatsapp_url:'#',
   },
   {
@@ -607,7 +625,13 @@ function renderPeopleGrid(list, kind){
   }).join('')}</div>`;
 }
 function renderComments(){
-  return `<div class="comments-list">${comments.map(c=>`<div class="comment-row"><div class="comment-avatar" style="background-image:url('${c.avatar}')"></div><div class="comment-main"><strong>${escapeHtml(c.name)} · <span style="display:inline;color:#98A2B3">${escapeHtml(c.time)}</span></strong><span class="comment-text">${escapeHtml(c.text)}</span></div></div>`).join('')}</div><div class="comment-box"><input class="comment-input" placeholder="Écrire un commentaire..." /><button class="comment-send" data-comment-send="1">Envoyer</button></div>`;
+  const rows=comments.map(c=>{
+    const badge=c.status==='going'
+      ?`<span class="comment-status going">Inscrit ✓</span>`
+      :c.status==='interested'?`<span class="comment-status interested">Intéressé</span>`:'';
+    return `<div class="comment-row"><div class="comment-avatar" style="background-image:url('${c.avatar}')"></div><div class="comment-main"><div class="comment-header"><strong>${escapeHtml(c.name)}</strong>${badge}<span class="comment-time">${escapeHtml(c.time)}</span></div><span class="comment-text">${escapeHtml(c.text)}</span></div></div>`;
+  }).join('');
+  return `<div class="comments-list">${rows}</div><div class="comment-box"><input class="comment-input" placeholder="Écrire un commentaire..." /><button class="comment-send" data-comment-send="1">Envoyer</button></div>`;
 }
 function renderEventMetaGrid(item){
   if(item.type!=='event') return '';
@@ -735,21 +759,30 @@ function renderEventBox(item){
       <button class="event-cta join" data-event-action="join" data-event-id="${escapeHtml(item.id)}">Je participe</button>`;
   }
 
-  const totalParticipants=(item.interested||0)+(item.going||0);
-  return `<div class="detail-event-box premium"><h3>Statut de l'événement</h3><div class="event-detail-stats"><div class="event-detail-stat"><strong>${totalParticipants}</strong><span>Participants</span></div></div>${renderEventSocialProof(item)}</div><div class="event-cta-row premium">${ctaHtml}</div>`;
+  return `<div class="event-cta-row premium">${ctaHtml}</div>`;
 }
 function renderDetailPanels(item){
   const isEvent=item.type==='event';
   const descText = item.details || item.text || '';
-  const programText = item.program || '';
+  const programItems = Array.isArray(item.program) ? item.program : null;
+  const programText = typeof item.program === 'string' ? item.program : '';
 
   const infoPanel = `<div class="detail-panel active" data-panel="infos">
     <div class="detail-section-card">
       <h3>À propos</h3>
       <p class="detail-text">${escapeHtml(descText)}</p>
-      ${isEvent?renderEventBox(item):''}
+      ${isEvent?renderEventSocialProof(item):''}
     </div>
+    ${isEvent?renderEventBox(item):''}
   </div>`;
+
+  const mapHtml = item.place ? `<div class="detail-map-block">
+    <iframe class="detail-map-iframe" src="https://maps.google.com/maps?q=${encodeURIComponent(item.place)}&output=embed&z=14" loading="lazy" allowfullscreen title="Carte ${escapeHtml(item.place)}"></iframe>
+    <div class="detail-map-footer">
+      <span>📍 ${escapeHtml(item.place)}</span>
+      <a href="https://www.google.com/maps/search/${encodeURIComponent(item.place)}" target="_blank" rel="noopener" class="detail-map-link">Ouvrir Maps →</a>
+    </div>
+  </div>` : '';
 
   const detailsPanel = `<div class="detail-panel" data-panel="details">
     <div class="detail-section-card">
@@ -757,15 +790,19 @@ function renderDetailPanels(item){
       ${renderEventMetaGrid(item)}
       ${item.whatsapp_url?`<a class="detail-whatsapp" href="${safeUrl(item.whatsapp_url)}" target="_blank" rel="noopener">Rejoindre le WhatsApp</a>`:''}
     </div>
+    ${mapHtml?`<div class="detail-section-card"><h3>Lieu</h3>${mapHtml}</div>`:''}
   </div>`;
+
+  const timelineHtml = programItems
+    ? `<div class="prog-timeline">${programItems.map((s,i)=>`<div class="prog-item"><div class="prog-dot ${i===0?'first':''}"></div><div class="prog-content"><div class="prog-time">${escapeHtml(s.time)}</div><div class="prog-title">${escapeHtml(s.title)}</div>${s.desc?`<div class="prog-desc">${escapeHtml(s.desc)}</div>`:''}</div></div>`).join('')}</div>`
+    : programText
+      ? `<p class="detail-text">${escapeHtml(programText)}</p>`
+      : `<p class="detail-text" style="color:#98A2B3;font-style:italic">Le programme détaillé sera publié prochainement par l'organisateur.</p>`;
 
   const programPanel = `<div class="detail-panel" data-panel="programme">
     <div class="detail-section-card">
       <h3>Programme</h3>
-      ${programText
-        ? `<p class="detail-text">${escapeHtml(programText)}</p>`
-        : `<p class="detail-text" style="color:#98A2B3;font-style:italic">Le programme détaillé sera publié prochainement par l'organisateur.</p>`
-      }
+      ${timelineHtml}
     </div>
   </div>`;
 
@@ -815,7 +852,7 @@ function renderDetail(item){
   return `<div class="detail-shell premium-detail">
     <div class="detail-top premium">
       <button class="detail-icon-btn" type="button" id="closeDetailBtn">‹</button>
-      <div class="detail-title-small">${escapeHtml(item.type==='event'?'Événement':'Publication')}</div>
+      <div class="detail-title-small">${item.type==='event'?[item.category,item.date,item.place].filter(Boolean).map(escapeHtml).join(' · '):'Publication'}</div>
       <button class="detail-icon-btn favorite-detail ${state.favoriteIds.has(item.id)?'active':''}" type="button" data-fav="${escapeHtml(item.id)}" aria-label="Ajouter aux favoris">${favoriteIcon(state.favoriteIds.has(item.id))}</button>
     </div>
 

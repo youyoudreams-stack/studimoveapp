@@ -129,7 +129,27 @@ require_once __DIR__ . '/auth_config.php';
     .person-row,.comment-row{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:10px;box-shadow:0 4px 12px rgba(0,0,0,.035)}
     .person-avatar,.comment-avatar{width:42px;height:42px;border-radius:999px;background-size:cover;background-position:center;flex-shrink:0}
     .person-main,.comment-main{min-width:0;flex:1}.person-main strong,.comment-main strong{display:block;font-size:13px;font-weight:950}.person-main span,.comment-main span{display:block;font-size:12px;color:#667085;font-weight:700;margin-top:2px}.person-badge{background:#f4f8ff;border:1px solid var(--line);border-radius:999px;padding:6px 9px;font-size:11px;font-weight:950;color:#0B6CFF}
+    .comment-header{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px}
+    .comment-time{font-size:11px;color:#98A2B3;font-weight:700;margin-left:auto}
+    .comment-status{font-size:10px;font-weight:950;border-radius:999px;padding:3px 8px}
+    .comment-status.going{background:#e9fbf0;color:#067647;border:1px solid #bbf7d0}
+    .comment-status.interested{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
     .comment-text{font-size:13px!important;color:#344054!important;line-height:1.35!important;font-weight:600!important}
+    /* ── Map block ── */
+    .detail-map-block{margin-top:14px}
+    .detail-map-iframe{width:100%;height:200px;border:0;border-radius:18px;display:block}
+    .detail-map-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:13px;font-weight:750;color:#344054}
+    .detail-map-link{color:var(--blue);font-weight:850;text-decoration:none}
+    /* ── Programme timeline ── */
+    .prog-timeline{position:relative;padding-left:26px;margin-top:4px}
+    .prog-timeline:before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line);border-radius:2px}
+    .prog-item{position:relative;margin-bottom:22px}
+    .prog-item:last-child{margin-bottom:0}
+    .prog-dot{position:absolute;left:-23px;top:5px;width:12px;height:12px;border-radius:50%;background:#fff;border:2.5px solid var(--blue);box-shadow:0 0 0 3px rgba(11,108,255,.12)}
+    .prog-dot.first{background:var(--blue)}
+    .prog-time{font-size:11px;font-weight:950;color:var(--blue);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+    .prog-title{font-size:14px;font-weight:950;color:#101828;margin-bottom:3px}
+    .prog-desc{font-size:13px;color:#667085;line-height:1.4;font-weight:600}
     .comment-box{margin-top:14px;display:flex;gap:8px;background:#f7faff;border:1px solid var(--line);border-radius:18px;padding:8px}
     .comment-input{flex:1;border:0;background:transparent;outline:none;font-size:13px;font-weight:650;min-width:0}.comment-send{border:0;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#fff;border-radius:999px;padding:9px 12px;font-size:12px;font-weight:950;cursor:pointer}
     
@@ -680,6 +700,6 @@ require_once __DIR__ . '/auth_config.php';
     <div class="gallery-dots"></div>
   </div>
   <div class="toast" id="toast"></div>
-  <script src="app.js?v=gallery-hero-v3"></script>
+  <script src="app.js?v=event-detail-v4"></script>
 </body>
 </html>
